@@ -60,18 +60,18 @@ jobs:
       - name: Notify Slack of result
         if: always()
         run: |
-          MESSAGE="📝 *Cppcheck Analysis for* \`${{ github.repository }}\`:\n\
-          • *Errors:* ${{ steps.count_issues.outputs.ERRORS }}\n\
-          • *Warnings:* ${{ steps.count_issues.outputs.WARNINGS }}\n\
-          • *Style issues:* ${{ steps.count_issues.outputs.STYLE }}\n\
-          • *Performance issues:* ${{ steps.count_issues.outputs.PERFORMANCE }}\n\
-          • *Total issues:* ${{ steps.count_issues.outputs.TOTAL }}"
+          MESSAGE="📝 *Cppcheck Analysis for* \`${{ github.repository }}\`:
+          • *Errors:* ${{ steps.count_issues.outputs.ERRORS }}
+          • *Warnings:* ${{ steps.count_issues.outputs.WARNINGS }}
+          • *Style issues:* ${{ steps.count_issues.outputs.STYLE }}
+          • *Performance issues:* ${{ steps.count_issues.outputs.PERFORMANCE }}
+          • *Total issues:* ${{ steps.count_issues.outputs.TOTAL }}
           
-          echo "----- 오류 상세 -----"
-          DETAIL=$(head -n 10 cppcheck-report.txt | tr '\n' '\n• ')
-          echo "$DETAIL"
+          🔎 *Top issues:*
+          • $(head -n 10 cppcheck-report.txt | tr '\n' '\n• ')"
 
-          MESSAGE="$MESSAGE\n\n🔎 *Top issues:*\n• $DETAIL"
+          # Slack은 \n을 줄바꿈으로 자동 처리 안 하므로 echo -e 사용
+          MESSAGE=$(echo -e "$MESSAGE")
 
           payload=$(jq -n --arg text "$MESSAGE" '{text: $text}')
 
