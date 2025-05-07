@@ -19,6 +19,10 @@ jobs:
           sudo apt update
           sudo apt install cppcheck -y
 
+      - name: Install jq
+        run: |
+          sudo apt install -y jq      
+
       - name: Run cppcheck on src/
         run: |
           cppcheck --enable=all --inconclusive --quiet --force --std=c++17 \
@@ -56,13 +60,15 @@ jobs:
       - name: Notify Slack of result
         if: always()
         run: |
+          MESSAGE="📝 *Cppcheck Analysis for* \`${{ github.repository }}\`:\n\
+          • *Errors:* ${{ steps.count_issues.outputs.ERRORS }}\n\
+          • *Warnings:* ${{ steps.count_issues.outputs.WARNINGS }}\n\
+          • *Style issues:* ${{ steps.count_issues.outputs.STYLE }}\n\
+          • *Performance issues:* ${{ steps.count_issues.outputs.PERFORMANCE }}\n\
+          • *Total issues:* ${{ steps.count_issues.outputs.TOTAL }}"
+
+          payload=$(jq -n --arg text "$MESSAGE" '{text: $text}')
+
           curl -X POST -H 'Content-type: application/json' \
-            --data '{
-              "text": "📝 Cppcheck Analysis for '${{ github.repository }}':\n\
-              • Errors: '${{ steps.count_issues.outputs.ERRORS }}'\n\
-              • Warnings: '${{ steps.count_issues.outputs.WARNINGS }}'\n\
-              • Style issues: '${{ steps.count_issues.outputs.STYLE }}'\n\
-              • Performance issues: '${{ steps.count_issues.outputs.PERFORMANCE }}'\n\
-              • Total issues: '${{ steps.count_issues.outputs.TOTAL }}'"
-            }' \
+            --data "$payload" \
             ${{ secrets.SLACK_WEBHOOK_URL }}
