@@ -66,9 +66,24 @@ jobs:
           • *Style issues:* ${{ steps.count_issues.outputs.STYLE }}\n\
           • *Performance issues:* ${{ steps.count_issues.outputs.PERFORMANCE }}\n\
           • *Total issues:* ${{ steps.count_issues.outputs.TOTAL }}"
+          
+          echo "----- 오류 상세 -----"
+          DETAIL=$(head -n 10 cppcheck-report.txt | tr '\n' '\n• ')
+          echo "$DETAIL"
+
+          MESSAGE="$MESSAGE\n\n🔎 *Top issues:*\n• $DETAIL"
 
           payload=$(jq -n --arg text "$MESSAGE" '{text: $text}')
 
-          curl -X POST -H 'Content-type: application/json' \
+          response=$(curl -s -w "%{http_code}" -o response.txt -X POST -H 'Content-type: application/json' \
             --data "$payload" \
-            ${{ secrets.SLACK_WEBHOOK_URL }}
+            ${{ secrets.SLACK_WEBHOOK_URL }})
+
+          echo "Slack API HTTP status code: $response"
+          echo "Slack API response body:"
+          cat response.txt
+
+          if [ "$response" -ne 200 ]; then
+            echo "❌ Slack notification failed with status $response"
+            exit 1
+          fi
