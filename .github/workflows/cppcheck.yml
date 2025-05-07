@@ -24,7 +24,28 @@ jobs:
           cppcheck --enable=all --inconclusive --quiet --force --std=c++17 \
             --suppress=missingIncludeSystem \
             --output-file=cppcheck-report.txt \
-            ./
+            ./ || true
+
+      - name: Count issues by severity
+        id: count_issues
+        run: |
+          ERRORS=$(grep -c "error:" cppcheck-report.txt || true)
+          WARNINGS=$(grep -c "warning:" cppcheck-report.txt || true)
+          STYLE=$(grep -c "style:" cppcheck-report.txt || true)
+          PERFORMANCE=$(grep -c "performance:" cppcheck-report.txt || true)
+          TOTAL=$(wc -l < cppcheck-report.txt || true)
+
+          echo "Errors: $ERRORS"
+          echo "Warnings: $WARNINGS"
+          echo "Style: $STYLE"
+          echo "Performance: $PERFORMANCE"
+          echo "Total: $TOTAL"
+
+          echo "ERRORS=$ERRORS" >> $GITHUB_OUTPUT
+          echo "WARNINGS=$WARNINGS" >> $GITHUB_OUTPUT
+          echo "STYLE=$STYLE" >> $GITHUB_OUTPUT
+          echo "PERFORMANCE=$PERFORMANCE" >> $GITHUB_OUTPUT
+          echo "TOTAL=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: Upload cppcheck report
         uses: actions/upload-artifact@v4
@@ -32,10 +53,16 @@ jobs:
           name: cppcheck-report
           path: cppcheck-report.txt
 
-
-      - name: Notify Slack of success
-        if: success()
+      - name: Notify Slack of result
+        if: always()
         run: |
           curl -X POST -H 'Content-type: application/json' \
-            --data '{"text":"✅ Cppcheck passed: No issues found in ${{ github.repository }}"}' \
-            ${{ secrets.SLACK_WEBHOOK_URL }}        
+            --data '{
+              "text": "📝 Cppcheck Analysis for '${{ github.repository }}':\n\
+              • Errors: '${{ steps.count_issues.outputs.ERRORS }}'\n\
+              • Warnings: '${{ steps.count_issues.outputs.WARNINGS }}'\n\
+              • Style issues: '${{ steps.count_issues.outputs.STYLE }}'\n\
+              • Performance issues: '${{ steps.count_issues.outputs.PERFORMANCE }}'\n\
+              • Total issues: '${{ steps.count_issues.outputs.TOTAL }}'"
+            }' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
