@@ -1,0 +1,36 @@
+name: Googletest on EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-googletest:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build & Run Googletest
+        run: |
+          cd ~/advancedsw
+          rm -rf build
+          mkdir build && cd build
+          cmake ..
+          make
+          ./runTests
+
+      - name: Notify Slack on success
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"✅ Googletest 실행 성공! (advancedsw1)"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"❌ Googletest 실행 실패! (advancedsw1)"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
