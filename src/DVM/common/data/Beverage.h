@@ -12,11 +12,15 @@ class Beverage {
     std::string name;
     int price;
     int stock;
+    int code;
+
   public:
-    Beverage(const std::string &name, int price, int stock);
+    Beverage(const std::string &name, int price, int stock, int code);
     std::string getName() const;
     int getPrice() const;
     int getStock() const;
+    int getCode() const;
+    void decreaseStock(int qty);
 };
 
 

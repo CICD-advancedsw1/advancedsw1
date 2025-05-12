@@ -7,20 +7,29 @@
 
 #include <vector>
 
-class Inventory;
-class Beverage;
+#include "../../application/service/PrepaymentHandler.h"
+#include "../../application/service/PurchaseHandler.h"
+#include "../../common/data/Beverage.h"
+#include "../IO/InputHandler.h"
+#include "../IO/OutputFormatter.h"
 class Display {
   private:
+    InputHandler* input;
+    OutputFormatter* output;
     Inventory* inventory;
+    PurchaseHandler* purchaseHandler;
+    PrepaymentHandler* prepaymentHandler;
 
   public:
-    Display(Inventory* inventory);
+    Display(Inventory* inventory, PurchaseHandler* purchaseHandler, PrepaymentHandler* prepaymentHandler);
     void mainMenu();
     void printMenu();
     void selectMenu();
-    void paymentMenu(int code, int qty);
-    void paymentRequest(int price);
+    void paymentMenu(Beverage* beverage, int qty);
+    void paymentRequest(Beverage* beverage, int qty);
     void inputCertCode();
+    void prePaymentMenu(Beverage *beverage, int qty);
+    void displayStatus(std::pair<bool, std::string> status);
 };
 
 

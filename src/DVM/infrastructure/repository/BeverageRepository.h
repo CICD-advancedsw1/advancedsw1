@@ -5,8 +5,8 @@
 #ifndef BEVERAGEREPOSITORY_H
 #define BEVERAGEREPOSITORY_H
 #include <vector>
-
-#include "../../application/domain/Beverage.h"
+#include <string>
+#include "../../common/data/Beverage.h"
 
 
 class BeverageRepository {
@@ -15,6 +15,7 @@ class BeverageRepository {
   public:
     BeverageRepository(std::string filePath);
     std::vector<Beverage>loadBeveragesFromFile();
+    void updateBeverage(Beverage* beverage);
 };
 
 
