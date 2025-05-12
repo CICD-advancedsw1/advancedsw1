@@ -4,3 +4,10 @@
 
 #include "BroadCast.h"
 
+BroadCast::BroadCast() {
+}
+BroadCast::~BroadCast() {
+}
+std::string BroadCast::broadCast(std::string message) {
+  return nullptr;
+}

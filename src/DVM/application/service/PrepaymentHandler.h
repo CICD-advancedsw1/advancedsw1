@@ -4,11 +4,20 @@
 
 #ifndef PREPAYMENTHANDLER_H
 #define PREPAYMENTHANDLER_H
+#include <string>
+
+#include "../../infrastructure/BroadCast.h"
 
 
-
+class Beverage;
 class PrepaymentHandler {
-
+  private:
+    BroadCast* broadCast;
+  public:
+    PrepaymentHandler(BroadCast* broadCast);
+    ~PrepaymentHandler();
+    std::string findAvailableDVM(Beverage* beverage, int qty);
+    //stockCode();
 };
 
 

@@ -4,11 +4,14 @@
 
 #ifndef BROADCAST_H
 #define BROADCAST_H
-
+#include <string>
 
 
 class BroadCast {
-
+  public:
+    BroadCast();
+    ~BroadCast();
+    std::string broadCast(std::string message);
 };
 
 
