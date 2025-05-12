@@ -6,7 +6,7 @@
 #define INVENTORY_H
 
 #include <vector>
-#include "Beverage.h"
+#include "../../common/data/Beverage.h"
 #include "../../infrastructure/repository/BeverageRepository.h"
 
 class Inventory {
@@ -16,12 +16,12 @@ class Inventory {
   public:
     Inventory(BeverageRepository* beverageRepository);
     void loadInventoryFromFile();
-    int getStock(int code) const;
-    std::string getName(int code) const;
-    int getPrice(int code) const;
+    Beverage* getBeverage(int code);
     int itemCount() const;
     bool isValidCode(int code) const;
     bool isAvailable(int code, int qty) const;
+    void showBeverages();
+    void decreaseStock(int code, int qty);
 };
 
 

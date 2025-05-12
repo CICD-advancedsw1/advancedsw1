@@ -4,10 +4,11 @@
 
 #include "Beverage.h"
 
-Beverage::Beverage(const std::string &name, int price, int stock) {
+Beverage::Beverage(const std::string &name, int price, int stock, int code) {
   this->name = name;
   this->price = price;
   this->stock = stock;
+  this->code = code;
 }
 
 std::string Beverage::getName() const {
@@ -20,4 +21,10 @@ int Beverage::getPrice() const {
 
 int Beverage::getStock() const {
   return this->stock;
+}
+int Beverage::getCode() const {
+  return this->code;
+}
+void Beverage::decreaseStock(int qty) {
+  this->stock -= qty;
 }

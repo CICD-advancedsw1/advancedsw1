@@ -9,7 +9,6 @@
 #include "../application/service/PrepaymentHandler.h"
 #include "../application/service/PurchaseHandler.h"
 #include "../infrastructure/BroadCast.h"
-#include "../infrastructure/PaymentSystem.h"
 #include "../presentation/UIFlow/Display.h"
 
 class DVMContext {
