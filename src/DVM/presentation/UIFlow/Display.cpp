@@ -88,7 +88,9 @@ void Display::displayStatus(std::pair<bool, std::string> status) {
   output->showPaymentStatus(status);
 }
 
+// UseCase 2: 선결제 물품 수령
 void Display::inputCertCode() {
+  inventory->CodeInput(input->showPrePayInput());
 }
 
 void Display::prePaymentMenu(Beverage *beverage, int qty) {
