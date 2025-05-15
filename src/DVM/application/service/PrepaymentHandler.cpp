@@ -5,14 +5,17 @@
 #include "PrepaymentHandler.h"
 
 #include "../../common/data/Beverage.h"
+#include "../../common/data/DVMNetworkData.h"
+
+using namespace std;
 
 PrepaymentHandler::PrepaymentHandler(BroadCast *broadCast) : broadCast(broadCast) {
 }
 PrepaymentHandler::~PrepaymentHandler() {
 }
-std::string PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
-  std::string srcId = "T2";
-  std::string code = "";
+string PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
+  string srcId = DVMNetworkData::getDVMId();
+  string code = "";
   if (beverage->getCode() < 10) {
     code.append("0");
   }

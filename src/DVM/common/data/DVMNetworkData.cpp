@@ -3,14 +3,51 @@
 //
 
 #include "DVMNetworkData.h"
-DVMNetworkData::DVMNetworkData() {
-  initDataFromFile();
+
+void DVMNetworkData::init(const string& filename) {
+  map<string,string> data = DVMNetworkData::initDataFromFile(filename);
+  x = data.at("x");
+  y = data.at("y");
+  DVMId = data.at("DVMId");
+  DVMIPs = DVMNetworkData::splitIPs(data.at("DVMIPs"));
 }
-DVMNetworkData::~DVMNetworkData() {
+
+map<string, string> DVMNetworkData::initDataFromFile(const string& filename) {
+  ifstream file(filename);
+  map<string, string> config;
+
+  if (!file.is_open()) {
+    cerr << "[Error] Failed to open file: " << filename << endl;
+    return config;
+  }
+
+  string line;
+  while (std::getline(file, line)) {
+    istringstream iss(line);
+    string key, value;
+
+    if (!(iss >> key >> value)) {
+      cerr << "[Warning] Skipping invalid line: " << line << endl;
+      continue;
+    }
+
+    config[key] = value;
+  }
+
+  file.close();
+  return config;
 }
-void DVMNetworkData::initDataFromFile() {
-  //TODO: file로 메타데이터 변경할 수 있도록
+
+vector<string> DVMNetworkData::splitIPs(const string& csv) {
+  vector<string> result;
+  istringstream ss(csv);
+  string token;
+  while (getline(ss, token, ',')) {
+    result.push_back(token);
+  }
+  return result;
 }
+
 std::string DVMNetworkData::getDVMId() {
   return DVMId;
 }

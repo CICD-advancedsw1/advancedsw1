@@ -10,6 +10,7 @@
 #include "../application/service/PurchaseHandler.h"
 #include "../infrastructure/BroadCast.h"
 #include "../presentation/UIFlow/Display.h"
+#include "data/DVMNetworkData.h"
 
 class DVMContext {
   private:
@@ -20,6 +21,7 @@ class DVMContext {
     BroadCast* broadCast;
     PaymentSystem* paymentSystem;
     BeverageRepository* beverageRepository;
+    DVMNetworkData* dvmNetworkData;
 
   public:
     DVMContext();
