@@ -33,7 +33,6 @@ class PrepaymentHandler {
                                                    int qty,
                                                    std::string dstIp,
                                                    std::string dstId);
-    ResponseStock *findAvailableDVM(Beverage *beverage, int qty);
     //stockCode();
 };
 
