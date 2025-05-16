@@ -17,8 +17,8 @@ class DVMNetworkData {
   private:
     static string DVMId;
     static vector<std::string> DVMIPs;
-    static string x;
-    static string y;
+    static int x;
+    static int y;
     static map<string,string> initDataFromFile(const string& filename);
     static vector<string> splitIPs(const string& csv);
 
@@ -27,8 +27,8 @@ class DVMNetworkData {
     static void init(const string& filename);
     static string getDVMId();
     static vector<std::string> getDVMIPs();
-    static string getX();
-    static string getY();
+    static int getX();
+    static int getY();
 };
 
 

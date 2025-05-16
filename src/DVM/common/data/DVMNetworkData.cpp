@@ -3,11 +3,15 @@
 //
 
 #include "DVMNetworkData.h"
+std::string DVMNetworkData::DVMId;
+std::vector<std::string> DVMNetworkData::DVMIPs;
+int DVMNetworkData::x;
+int DVMNetworkData::y;
 
 void DVMNetworkData::init(const string& filename) {
   map<string,string> data = DVMNetworkData::initDataFromFile(filename);
-  x = data.at("x");
-  y = data.at("y");
+  x = stoi(data.at("x"));
+  y = stoi(data.at("y"));
   DVMId = data.at("DVMId");
   DVMIPs = DVMNetworkData::splitIPs(data.at("DVMIPs"));
 }
@@ -54,9 +58,9 @@ std::string DVMNetworkData::getDVMId() {
 std::vector<std::string> DVMNetworkData::getDVMIPs() {
   return DVMIPs;
 }
-std::string DVMNetworkData::getX() {
+int DVMNetworkData::getX() {
   return x;
 }
-std::string DVMNetworkData::getY() {
+int DVMNetworkData::getY() {
   return y;
 }
