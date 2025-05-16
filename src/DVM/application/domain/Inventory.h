@@ -8,15 +8,13 @@
 #include <vector>
 #include "../../common/data/Beverage.h"
 #include "../../infrastructure/repository/BeverageRepository.h"
-#include "PrepaymentHandler.h"
 
 class Inventory {
   private:
     std::vector<Beverage> items;
     BeverageRepository* beverageRepository;
-    PrepaymentHandler* prepaymentHandler;
   public:
-    Inventory(BeverageRepository* beverageRepository, PrepaymentHandler* prepaymentHandler);
+    Inventory(BeverageRepository* beverageRepository);
     void loadInventoryFromFile();
     Beverage* getBeverage(int code);
     int itemCount() const;

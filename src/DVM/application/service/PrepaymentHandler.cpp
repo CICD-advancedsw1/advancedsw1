@@ -4,6 +4,8 @@
 
 #include "PrepaymentHandler.h"
 
+#include <algorithm>
+
 #include "../../common/data/Beverage.h"
 
 PrepaymentHandler::PrepaymentHandler(BroadCast *broadCast) : broadCast(broadCast) {
@@ -24,7 +26,7 @@ std::string PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
     {
       "msg_type": "req_stock",
       "src_id": ")" + srcId + R"(",
-      "dst_id": "0",ㅇ
+      "dst_id": "0",
       "msg_content": {
         "item_code": ")" + code + R"(",
         "item_num": )" + std::to_string(qty) + R"(
@@ -40,6 +42,8 @@ std::string PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
  * @return 해당 cert code의 음료코드 (-1 if not exist)
  */
 int PrepaymentHandler::PrePaymentCheck(std::string code){
+  //todo: file 입출력으로 고치기.
+  //file에서 일치하는 코드 찾기
   for(const auto& p : Cert_code){
     if(p.first == code){
       EraseCode(code);
@@ -51,6 +55,7 @@ int PrepaymentHandler::PrePaymentCheck(std::string code){
 }
 
 void PrepaymentHandler::EraseCode(std::string code){
+  //todo: file 에서 지우기
   auto it = std::find(Cert_code.begin(), Cert_code.end(), code);
   if(it != Cert_code.end()){
     Cert_code.erase(it);
