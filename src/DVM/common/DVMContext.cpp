@@ -29,11 +29,12 @@ DVMContext::~DVMContext() {
 void DVMContext::dependencyInjection() {
   std::cout << "\n=== DVM System init ===" << std::endl;
   //TODO:의존성 주입필요
+  DVMNetworkData::init("../src/DVM/database/DVMData.txt");
   this->beverageRepository = new BeverageRepository("C:/Users/user/CLionProjects/advancedsw1/src/DVM/database/beverages.txt");
+  this->inventory = new Inventory(beverageRepository);
   this->broadCast = new BroadCast();
   this->paymentSystem = new PaymentSystem("C:/Users/user/CLionProjects/advancedsw1/src/DVM/database/paymentInformation.txt");
   this->prepaymentHandler = new PrepaymentHandler(broadCast);
-  this->inventory = new Inventory(beverageRepository, prepaymentHandler);
   this->purchaseHandler = new PurchaseHandler(paymentSystem, inventory);
   this->display = new Display(inventory, purchaseHandler, prepaymentHandler);
   std::cout << "=== Init success ===" << std::endl;
