@@ -11,7 +11,7 @@ class BroadCast {
   public:
     BroadCast();
     ~BroadCast();
-    std::string broadCast(std::string message);
+    std::string broadCast(const std::string &ip, int port, const std::string &message);
 };
 
 
