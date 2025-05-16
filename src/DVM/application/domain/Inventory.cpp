@@ -56,17 +56,3 @@ void Inventory::decreaseStock(int code, int qty) {
   items[code - 1].decreaseStock(qty);
   beverageRepository->updateBeverage(&items[code-1]);
 }
-
-/**
- * @brief use case2 ssd와 msg 내용이 달라짐 msg == -1 일때와 아닐때로 변경됨
- */
-void Inventory::CodeInput(std::string code){
-  int result = prepaymentHandler->PrePaymentCheck(code);
-
-  
-  if(result != -1){
-    //TODO : 인증실패, 유효하지 않은코드입니다. 다시 시도해주세요 출력 (Display에서 호출하도록 하꾸어주어야 할 것 같음)
-  }else{
-    //TODO : 인증성공, 음료제공하는 상태 호출하기
-  }
-}
