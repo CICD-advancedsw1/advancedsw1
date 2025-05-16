@@ -93,3 +93,15 @@ char InputHandler::getYesOrNoForPayment() {
     std::cout << "[Input Error] Select Yes or No\n";
   }
 }
+
+
+std::string InputHandler::showPrePayInput(){
+  std::string line;
+
+  std::cout << "============= Receive PrePayment Drink =============\n";
+  std::cout << "Input Certificate Code : \n";
+
+  std::getline(std::cin, line);
+
+  return line;
+}

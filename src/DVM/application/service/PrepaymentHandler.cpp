@@ -4,6 +4,8 @@
 
 #include "PrepaymentHandler.h"
 
+#include <algorithm>
+
 #include "../../common/data/Beverage.h"
 #include "../../common/data/DVMNetworkData.h"
 #include"../../../../include/nlohmann/json.hpp"
@@ -20,6 +22,7 @@ PrepaymentHandler::PrepaymentHandler(BroadCast *broadCast) : broadCast(broadCast
 }
 
 PrepaymentHandler::~PrepaymentHandler() {
+
 }
 
 string PrepaymentHandler::makeRequestStockMessage(int code, int qty) {
@@ -83,7 +86,7 @@ pair<bool, string> PrepaymentHandler::prepaymentRequest(Beverage* beverage, int 
   }
 }
 
-ResponseStock* PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
+ResponseStock *PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
 
   string requestMessage = makeRequestStockMessage(beverage->getCode(), qty);
 
@@ -152,4 +155,30 @@ std::string PrepaymentHandler::generateCertificationCode(int length) {
   }
 
   return result;
+}
+
+/**
+ * @brief 입력한 certification code가 DVM내 존재하는지 확인, 확인하는 CertCode가 string에서 vector<pair<string, int>> 자료로 바뀜
+ * @param code 입력받은 certification code
+ * @return 해당 cert code의 음료코드 (-1 if not exist)
+ */
+int PrepaymentHandler::PrePaymentCheck(std::string code){
+  //todo: file 입출력으로 고치기.
+  //file에서 일치하는 코드 찾기
+  for(const auto& p : Cert_code){
+    if(p.first == code){
+      EraseCode(code);
+      return p.second;
+    }
+  }
+
+  return -1;
+}
+
+void PrepaymentHandler::EraseCode(std::string code){
+  //todo: file 에서 지우기
+  auto it = std::find(Cert_code.begin(), Cert_code.end(), code);
+  if(it != Cert_code.end()){
+    Cert_code.erase(it);
+  }
 }

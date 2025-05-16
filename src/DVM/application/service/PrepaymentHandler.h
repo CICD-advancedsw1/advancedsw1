@@ -5,6 +5,7 @@
 #ifndef PREPAYMENTHANDLER_H
 #define PREPAYMENTHANDLER_H
 #include <string>
+#include <vector>
 
 #include "../../infrastructure/BroadCast.h"
 
@@ -16,10 +17,13 @@ class PrepaymentHandler {
     BroadCast* broadCast;
     double findDistance(int x, int y);
     std::string generateCertificationCode(int length);
-
+    std::vector<std::pair<std::string, int>> Cert_code;
   public:
     PrepaymentHandler(BroadCast* broadCast);
     ~PrepaymentHandler();
+    ResponseStock *findAvailableDVM(Beverage *beverage, int qty);
+    void EraseCode(std::string code);
+    int PrePaymentCheck(std::string code);
     std::string makeRequestStockMessage(int code, int qty);
     std::string makeRequestPrepaymentMessage(std::string certCode,
                                              int itemCode,
@@ -29,7 +33,7 @@ class PrepaymentHandler {
                                                    int qty,
                                                    std::string dstIp,
                                                    std::string dstId);
-    ResponseStock* findAvailableDVM(Beverage* beverage, int qty);
+    ResponseStock *findAvailableDVM(Beverage *beverage, int qty);
     //stockCode();
 };
 
