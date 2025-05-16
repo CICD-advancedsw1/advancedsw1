@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "../../application/domain/Inventory.h"
+#include "../../common/data/ResponseStock.h"
 
 Display::Display(Inventory *inventory,
                  PurchaseHandler *purchaseHandler,
@@ -94,6 +95,34 @@ void Display::inputCertCode() {
 }
 
 void Display::prePaymentMenu(Beverage *beverage, int qty) {
-  //output
-  prepaymentHandler->findAvailableDVM(beverage, qty);
+  // [재고 부족 메시지 출력]
+  output->printStockShortage(beverage);  // 예: "[재고 부족] 현재 6개 남아 있습니다."
+
+  // [재고 요청 중 메시지]
+  output->printRequestingOtherDVM();  // 예: "다른 DVM에 정보 요청 중입니다..."
+
+  // [선결제 가능한 DVM 조회]
+  ResponseStock* response = prepaymentHandler->findAvailableDVM(beverage, qty);
+  if (response == nullptr) {
+    //todo:output에러처리
+    return;
+  }
+  // [재고 확인 완료 출력]
+  output->printAvailableOtherDVMInfo(response, qty);
+  // 예: "다음 DVM에서 수령 가능합니다. 위치: X좌표 1 Y좌표 2 (DVM-05)"
+  // [총 금액 출력]
+  int totalPrice = beverage->getPrice() * qty;
+  output->printTotalPrice(totalPrice);  // 예: "총 금액: 14000원"
+
+  //todo:input 처리 및 DVM에 요청
+  pair<bool, string> result = prepaymentHandler->prepaymentRequest(beverage, qty, response->getSrcIp(), response->getSrcId());
+  if (!result.first) {
+    //todo: 실패 처리
+  }
+
+  paymentRequest(beverage, qty);
+
+  output->printPrePaymentCodeAndDVMLocation(result.second, response);
+  output->showGoodbye();
+
 }
