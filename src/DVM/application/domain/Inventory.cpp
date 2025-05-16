@@ -41,7 +41,7 @@ bool Inventory::isAvailable(int code, int qty) const {
 
 void Inventory::showBeverages() {
   for (size_t i = 0; i < items.size(); ++i) {
-    printf("%02d   | %-13s | %5d won | %2d pcs\n",
+    printf("%02d   | %-13s | %5d 원 | %2d 개\n",
            items[i].getCode(),
            items[i].getName().c_str(),
            items[i].getPrice(),

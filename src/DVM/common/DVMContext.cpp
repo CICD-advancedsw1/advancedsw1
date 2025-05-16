@@ -29,7 +29,7 @@ DVMContext::~DVMContext() {
 void DVMContext::dependencyInjection() {
   std::cout << "\n=== DVM System init ===" << std::endl;
   //TODO:의존성 주입필요
-  DVMNetworkData::init("C:/Users/kan02/CLionProjects/advancedsw1/src/DVM/database/DVMData.txt");
+  DVMNetworkData::init("../src/DVM/database/DVMData.txt");
   this->beverageRepository = new BeverageRepository("C:/Users/user/CLionProjects/advancedsw1/src/DVM/database/beverages.txt");
   this->inventory = new Inventory(beverageRepository);
   this->broadCast = new BroadCast();
