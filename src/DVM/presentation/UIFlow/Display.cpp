@@ -88,9 +88,20 @@ void Display::displayStatus(std::pair<bool, std::string> status) {
   output->showPaymentStatus(status);
 }
 
+// UseCase 2: 선결제 물품 수령
 void Display::inputCertCode() {
-}
 
+  std::string code = input->showPrePayInput();
+  //todo: input 받기
+  int result = prepaymentHandler->PrePaymentCheck(code);
+
+
+  if(result != -1){
+    //TODO : 인증실패, 유효하지 않은코드입니다. 다시 시도해주세요 출력 (Display에서 호출하도록 하꾸어주어야 할 것 같음)
+  }else{
+    //TODO : 인증성공, 음료제공하는 상태 호출하기
+  }
+}
 void Display::prePaymentMenu(Beverage *beverage, int qty) {
   //output
   prepaymentHandler->findAvailableDVM(beverage, qty);
