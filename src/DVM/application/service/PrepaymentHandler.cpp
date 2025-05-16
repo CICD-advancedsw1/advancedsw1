@@ -4,152 +4,60 @@
 
 #include "PrepaymentHandler.h"
 
+#include <algorithm>
+
 #include "../../common/data/Beverage.h"
-#include "../../common/data/DVMNetworkData.h"
-#include"../../../../include/nlohmann/json.hpp"
-#include <cmath>
-#include <limits>
-#include <random>
-
-#include "../../common/data/ResponseStock.h"
-
-using namespace std;
-using namespace nlohmann;
 
 PrepaymentHandler::PrepaymentHandler(BroadCast *broadCast) : broadCast(broadCast) {
 }
-
 PrepaymentHandler::~PrepaymentHandler() {
-}
 
-string PrepaymentHandler::makeRequestStockMessage(int code, int qty) {
-  string reqCode = "";
-  if (code < 10) {
-    reqCode.append("0");
+}
+std::string PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
+  std::string srcId = "T2";
+  std::string code = "";
+  if (beverage->getCode() < 10) {
+    code.append("0");
   }
-  reqCode.append(std::to_string(code));
+  code.append(std::to_string(beverage->getCode()));
 
-  json request;
-  request["msg_type"] = "req_stock";
-  request["src_id"] = DVMNetworkData::getDVMId();
-  request["dst_id"] = 0;
-  request["msg_content"] = {
-    {"item_code", reqCode},
-    {"item_num", to_string(qty)}
-  };
-
-  return request.dump();
-}
-
-string PrepaymentHandler::makeRequestPrepaymentMessage(string certCode, int itemCode, int qty, string dstId) {
-  string reqItemCode = "";
-  if (itemCode < 10) {
-    reqItemCode.append("0");
-  }
-  reqItemCode.append(std::to_string(itemCode));
-
-  json request;
-  request["msg_type"] = "req_prepay";
-  request["src_id"] = DVMNetworkData::getDVMId();
-  request["dst_id"] = dstId;
-  request["msg_content"] = {
-    {"item_code", reqItemCode},
-    {"item_num", to_string(qty)},
-    {"cert_code",  certCode}
-  };
-
-  return request.dump();
-}
-
-pair<bool, string> PrepaymentHandler::prepaymentRequest(Beverage* beverage, int qty, string dstIp, string dstId) {
-  string certCode = generateCertificationCode(8);
-  string requestMessage = makeRequestPrepaymentMessage(certCode, beverage->getCode(), qty, dstId);
-  string response = broadCast->broadCast(dstIp, 9999,  requestMessage);
-  try {
-    json parsed = json::parse(response);
-    if (parsed["msg_type"] != "resp_prepay") {
-      return pair(false, certCode);
-    }
-
-    string availability = parsed["msg_content"]["availability"];
-    if (availability == "T") {
-      return pair(true, certCode);
-    }
-
-    return pair(false, certCode);
-  } catch (const std::exception& e) {
-    std::cerr << "[JSON Parse Error] " << e.what() << std::endl;
-    return pair(false, certCode);
-  }
-}
-
-ResponseStock* PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
-
-  string requestMessage = makeRequestStockMessage(beverage->getCode(), qty);
-
-  vector<string> ips = DVMNetworkData::getDVMIPs();
-  string availableDVMId;
-  string availableDVMIp;
-  int availableDVMCoorX = 0;
-  int availableDVMCoorY = 0;
-  double minDistance = numeric_limits<double>::max();
-
-  for (int i = 0; i < ips.size(); i++) {
-    string response = broadCast->broadCast(ips.at(i),9999, requestMessage);
-    if (response.empty()) {
-      continue;
-    }
-    try {
-      json parsed = json::parse(response);
-      string src_id = parsed["src_id"];
-      string itemCode = parsed["msg_content"]["item_code"];
-      int itemNum = parsed["msg_content"]["item_num"];
-      if (parsed["msg_type"] != "resp_stock") {
-        continue;
+  // 1. Create broadcast request
+  std::string request = R"(
+    {
+      "msg_type": "req_stock",
+      "src_id": ")" + srcId + R"(",
+      "dst_id": "0",
+      "msg_content": {
+        "item_code": ")" + code + R"(",
+        "item_num": )" + std::to_string(qty) + R"(
       }
-      if (qty > itemNum) {
-        continue;
-      }
-      int coorX = parsed["msg_content"]["coor_x"];
-      int coorY = parsed["msg_content"]["coor_y"];
-      double distance = findDistance(coorX, coorY);
-      if (minDistance > distance) {
-        minDistance = distance;
-        availableDVMId = src_id;
-        availableDVMIp = ips.at(i);
-        availableDVMCoorX = coorX;
-        availableDVMCoorY = coorY;
-      }
-    } catch (const std::exception& e) {
-      std::cerr << "[JSON Parse Error] " << e.what() << std::endl;
-      continue;
+    })";
+
+  return broadCast->broadCast(request);
+}
+
+/**
+ * @brief 입력한 certification code가 DVM내 존재하는지 확인, 확인하는 CertCode가 string에서 vector<pair<string, int>> 자료로 바뀜
+ * @param code 입력받은 certification code
+ * @return 해당 cert code의 음료코드 (-1 if not exist)
+ */
+int PrepaymentHandler::PrePaymentCheck(std::string code){
+  //todo: file 입출력으로 고치기.
+  //file에서 일치하는 코드 찾기
+  for(const auto& p : Cert_code){
+    if(p.first == code){
+      EraseCode(code);
+      return p.second;
     }
   }
-  if (minDistance == numeric_limits<double>::max()) {
-    return nullptr;
-  }
 
-  return new ResponseStock(availableDVMCoorX, availableDVMCoorY, availableDVMId, availableDVMIp);
+  return -1;
 }
 
-double PrepaymentHandler::findDistance(int x, int y) {
-  return sqrt(pow(x - DVMNetworkData::getX(), 2) + pow(y - DVMNetworkData::getY(), 2));
-}
-
-std::string PrepaymentHandler::generateCertificationCode(int length) {
-  const std::string charset =
-      "abcdefghijklmnopqrstuvwxyz"
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      "0123456789";
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, charset.size() - 1);
-
-  std::string result;
-  for (int i = 0; i < length; ++i) {
-    result += charset[dist(gen)];
+void PrepaymentHandler::EraseCode(std::string code){
+  //todo: file 에서 지우기
+  auto it = std::find(Cert_code.begin(), Cert_code.end(), code);
+  if(it != Cert_code.end()){
+    Cert_code.erase(it);
   }
-
-  return result;
 }
