@@ -16,7 +16,7 @@ void OutputFormatter::showMainMenu() {
   cout << "=============================\n";
 }
 void OutputFormatter::showDrinkMenu(Inventory* inventory) {
-  cout << "==================== 음료 선택 메뉴 ====================\n";
+  cout << "\n==================== 음료 선택 메뉴 ====================\n";
   cout << "코드 | 이름          | 가격     | 수량\n";
   cout << "----------------------------------------------------\n";
   inventory->showBeverages();
@@ -26,7 +26,7 @@ void OutputFormatter::showPayAndQuantity(Beverage *beverage, int qty) {
   cout << "\n[선택 완료]:\n" << beverage->getName() << " " << qty << "개가 선택되었습니다.\n";
   cout << "\n최종 선택 목록:\n";
   cout << "- " << beverage->getName() << " " << qty << "개\n";
-  cout << "\n총 금액: " << beverage->getPrice() << "원\n";
+  cout << "\n총 금액: " << beverage->getPrice()*qty << "원\n";
 }
 void OutputFormatter::showPaymentMenu() {
   std::cout << "\n결제 단계로 진행합니다...\n";
@@ -39,20 +39,20 @@ void OutputFormatter::showPaymentMenu() {
 
 void OutputFormatter::showPaymentStatus(const std::pair<bool, std::string> &status) {
   if (status.first) {
-    std::cout << "[결제 승인] " << status.second << std::endl;
+    std::cout <<  status.second << std::endl;
   } else {
-    std::cerr << "[결제 실패] " << status.second << std::endl;
+    std::cerr << status.second << std::endl;
   }
 }
 
 void OutputFormatter::showGiveBeverageGuide(Beverage* beverage, int qty) {
-  cout << "음료를 준비 중입니다...";
-  cout << "[음료 제공] " << beverage->getName() << qty << "개가 제공되었습니다.";
+  cout << "\n음료를 준비 중입니다...\n";
+  cout << "[음료 제공] " << beverage->getName() << qty << "개가 제공되었습니다.\n";
 }
 
 void OutputFormatter::showGoodbye() {
   std::cout << "\n==============================\n";
-  std::cout << "         감사합니다. 또 이용해주세요! \n";
+  std::cout << "감사합니다. 또 이용해주세요! \n";
   std::cout << "==============================\n";
 }
 
@@ -63,6 +63,15 @@ void OutputFormatter::printStockShortage(Beverage* beverage) {
 
 void OutputFormatter::printRequestingOtherDVM() {
   std::cout << "[재고 확인 중...] 다른 DVM들에 정보 요청 중입니다...\n";
+}
+
+void OutputFormatter::printNotEnoughStock() {
+  std::cout << "[재고 없음] 재고가 없습니다.\n";
+}
+
+void OutputFormatter::printReturnInitialScreen() {
+  std::cout << "\n초기 화면으로 돌아갑니다.\n";
+  std::cout << "----------------------------------------------------\n";
 }
 
 void OutputFormatter::printAvailableOtherDVMInfo(ResponseStock* response, int qty) {

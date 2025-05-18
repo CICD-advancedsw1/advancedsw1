@@ -53,7 +53,7 @@ void Display::selectMenu() {
 
   if (!inventory->isAvailable(beverage->getCode(), quantity)) {
     int stock = beverage->getStock();
-    std::cout << "[Out of Stock] Only " << stock << " remaining.\n";
+    std::cout << "\n[재고 부족] " << beverage->getName() << "는(은) 현재 " << stock << "개 남아 있습니다.\n";
     prePaymentMenu(beverage, quantity);
   } else {
     paymentMenu(beverage, quantity);
@@ -65,10 +65,11 @@ void Display::paymentMenu(Beverage *beverage, int qty) {
   // 결제 화면 출력
   output->showPayAndQuantity(beverage, qty);
   // 결제를 할 것인지 사용자에게 입력 받기 (ex. Y)
-  if (input->getYesOrNoForPayment() == 'Y') {
+  char answer = input->getYesOrNoForPayment();
+  if (answer == 'Y' || answer == 'y') {
     paymentRequest(beverage, qty);
   } else {
-    //종료 안내
+    output->printReturnInitialScreen();
   }
 }
 
@@ -80,7 +81,15 @@ void Display::paymentRequest(Beverage *beverage, int qty) {
   // 카드 잔액 확인 및 결제 -> Inventory 에서 수량 줄이기
   // 모두 DB 에 반영됨
   // TODO: Transaction 처리
-  displayStatus(purchaseHandler->purchase(input->getCardNumber(), beverage, qty));
+  pair<bool, string> status = purchaseHandler->purchase(input->getCardNumber(), beverage, qty);
+  displayStatus(status);
+  if (status.first) {
+    output->showGiveBeverageGuide(beverage, qty);
+    output->showGoodbye();
+  }
+  else {
+    output->printReturnInitialScreen();
+  }
 }
 
 // UseCase 3: 음료 결제
@@ -103,6 +112,7 @@ void Display::inputCertCode() {
     //TODO : 인증성공, 음료제공하는 상태 호출하기
   }
 }
+
 void Display::prePaymentMenu(Beverage *beverage, int qty) {
   // [재고 부족 메시지 출력]
   output->printStockShortage(beverage);  // 예: "[재고 부족] 현재 6개 남아 있습니다."
@@ -113,7 +123,8 @@ void Display::prePaymentMenu(Beverage *beverage, int qty) {
   // [선결제 가능한 DVM 조회]
   ResponseStock* response = prepaymentHandler->findAvailableDVM(beverage, qty);
   if (response == nullptr) {
-    //todo:output에러처리
+    output->printNotEnoughStock();
+    output->printReturnInitialScreen();
     return;
   }
   // [재고 확인 완료 출력]

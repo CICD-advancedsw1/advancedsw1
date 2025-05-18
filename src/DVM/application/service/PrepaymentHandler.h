@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "../../infrastructure/BroadCast.h"
+#include "../../infrastructure/repository/CertificationCodeRepository.h"
+#include "../domain/Inventory.h"
 
 
 class ResponseStock;
@@ -15,14 +17,17 @@ class Beverage;
 class PrepaymentHandler {
   private:
     BroadCast* broadCast;
+    CertificationCodeRepository* certificationCodeRepository;
+    Inventory* inventory;
     double findDistance(int x, int y);
-    std::string generateCertificationCode(int length);
     std::vector<std::pair<std::string, int>> Cert_code;
   public:
-    PrepaymentHandler(BroadCast* broadCast);
+    PrepaymentHandler(BroadCast* broadCast, CertificationCodeRepository* certificationCodeRepository, Inventory* inventory);
     ~PrepaymentHandler();
     ResponseStock *findAvailableDVM(Beverage *beverage, int qty);
+    std::string generateCertificationCode(int length);
     void EraseCode(std::string code);
+    bool handlePrepaymentRequest(std::string certCode, int itemCode, int qty);
     int PrePaymentCheck(std::string code);
     std::string makeRequestStockMessage(int code, int qty);
     std::string makeRequestPrepaymentMessage(std::string certCode,

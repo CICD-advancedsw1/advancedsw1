@@ -7,6 +7,8 @@ std::string DVMNetworkData::DVMId;
 std::vector<std::string> DVMNetworkData::DVMIPs;
 int DVMNetworkData::x;
 int DVMNetworkData::y;
+int DVMNetworkData::requestPort;
+int DVMNetworkData::serverPort;
 
 void DVMNetworkData::init(const string& filename) {
   map<string,string> data = DVMNetworkData::initDataFromFile(filename);
@@ -14,9 +16,12 @@ void DVMNetworkData::init(const string& filename) {
   y = stoi(data.at("y"));
   DVMId = data.at("DVMId");
   DVMIPs = DVMNetworkData::splitIPs(data.at("DVMIPs"));
+  requestPort = stoi(data.at("requestPort"));
+  serverPort = stoi(data.at("serverPort"));
 }
 
 map<string, string> DVMNetworkData::initDataFromFile(const string& filename) {
+  std::cout << "Load DVM Network Data from File...\n";
   ifstream file(filename);
   map<string, string> config;
 
@@ -39,6 +44,7 @@ map<string, string> DVMNetworkData::initDataFromFile(const string& filename) {
   }
 
   file.close();
+  std::cout << "Load DVM Network Data from File Success.\n";
   return config;
 }
 
@@ -63,4 +69,10 @@ int DVMNetworkData::getX() {
 }
 int DVMNetworkData::getY() {
   return y;
+}
+int DVMNetworkData::getServerPort() {
+  return serverPort;
+}
+int DVMNetworkData::getRequestPort() {
+  return requestPort;
 }

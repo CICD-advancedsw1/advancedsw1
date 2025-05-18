@@ -14,11 +14,11 @@ Inventory::Inventory(BeverageRepository *beverageRepository): beverageRepository
 void Inventory::loadInventoryFromFile() {
   std::cout << "Load inventory from File..." << std::endl;
   this->items = beverageRepository->loadBeveragesFromFile();
+  std::cout << "Load inventory from File Success" << std::endl;
 }
 
 Beverage* Inventory::getBeverage(int code) {
   if (!isValidCode(code)) {
-    std::cout << "Inventory Not contains beverage code " << code << std::endl;
     return nullptr;
   }
   return &items[code - 1];

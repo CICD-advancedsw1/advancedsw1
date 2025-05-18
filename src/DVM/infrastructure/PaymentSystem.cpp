@@ -18,8 +18,7 @@ std::pair<bool, std::string> PaymentSystem::connectSystem(std::string cardNumber
   std::ifstream inFile(path);
 
   if (!inFile.is_open()) {
-    std::cerr << "[Payment Error] Cannot open file: " << this->path << std::endl;
-    return std::pair(false, "[Payment Error] Cannot connect system:");
+    return std::pair(false, "[결제 실패] 결제 시스템에 연결할 수 없습니다.");
   }
 
   std::vector<std::string> lines;
@@ -38,9 +37,8 @@ std::pair<bool, std::string> PaymentSystem::connectSystem(std::string cardNumber
           balance -= price;
           updated = true;
         } else {
-          std::cout << "[Payment Failed] Not enough balance.\n";
           inFile.close();
-          return std::pair(false, "[Payment Failed] Not enough balance.");
+          return std::pair(false, "[결제 실패] 잔액이 부족합니다.\n");
         }
         // 카드 정보 업데이트
         line = fileCardNumber + " " + std::to_string(balance);
@@ -52,8 +50,7 @@ std::pair<bool, std::string> PaymentSystem::connectSystem(std::string cardNumber
   inFile.close();
 
   if (!updated) {
-    std::cout << "[Error] Card not found.\n";
-    return std::pair(false, "[Error] Card not found.");
+    return std::pair(false, "[결제 실패] 카드 정보를 확인할 수 없습니다.");
   }
 
 
@@ -64,6 +61,5 @@ std::pair<bool, std::string> PaymentSystem::connectSystem(std::string cardNumber
   }
   outFile.close();
 
-  std::cout << "[Payment Success] Payment Success.\n";
-  return std::pair(true, "[Payment Success] Payment Success.");
+  return std::pair(true, "[결제 승인] 결제가 성공적으로 완료되었습니다.");
 }

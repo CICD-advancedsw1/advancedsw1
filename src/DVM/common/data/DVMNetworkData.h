@@ -19,6 +19,8 @@ class DVMNetworkData {
     static vector<std::string> DVMIPs;
     static int x;
     static int y;
+    static int serverPort;
+    static int requestPort;
     static map<string,string> initDataFromFile(const string& filename);
     static vector<string> splitIPs(const string& csv);
 
@@ -29,6 +31,8 @@ class DVMNetworkData {
     static vector<std::string> getDVMIPs();
     static int getX();
     static int getY();
+    static int getServerPort();
+    static int getRequestPort();
 };
 
 

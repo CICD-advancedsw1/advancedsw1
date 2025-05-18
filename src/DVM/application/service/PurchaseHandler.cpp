@@ -12,7 +12,7 @@
 PurchaseHandler::PurchaseHandler(PaymentSystem *p, Inventory *i):paymentSystem(p), inventory(i) {
 }
 std::pair<bool, std::string> PurchaseHandler::purchase(std::string cardNumber, Beverage* beverage, int qty) {
-  std::pair<bool, std::string> result = paymentSystem->connectSystem(cardNumber, beverage->getPrice());
+  std::pair<bool, std::string> result = paymentSystem->connectSystem(cardNumber, beverage->getPrice()*qty);
   if (!result.first) {
     return result;
   }
