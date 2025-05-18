@@ -11,7 +11,8 @@
 class FakeCertificationRepository : public CertificationCodeRepository {
   public:
     bool saved = false;
-    std::string savedCode;
+    bool deleteCalled = false;
+    std::string savedCode = "";
     int savedItemCode = -1;
     int savedQty = -1;
     std::unordered_map<std::string, CodeInfo> savedCodes;
@@ -24,16 +25,19 @@ class FakeCertificationRepository : public CertificationCodeRepository {
     }
 
     std::optional<CodeInfo> findByCode(const std::string &certCode) override {
-      auto it = savedCodes.find(certCode);
-      if (it != savedCodes.end()) return it->second;
-      return std::nullopt;
+      if (savedCode == certCode) {
+        return CodeInfo{savedItemCode, savedQty};
+      }
+      return nullopt;
     }
     void loadFromFile() override {
 
     };
 
     bool deleteByCode(const std::string &certCode) override {
-      return savedCodes.erase(certCode) > 0;
+      deleteCalled = true;
+      savedCode = "";
+      return true;
     }
 
     void saveToFile() override {

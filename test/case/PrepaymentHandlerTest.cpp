@@ -360,3 +360,33 @@ TEST(PrepaymentHandlerTest, HandlePrepaymentRequest_StockUnavailable_Fails) {
 
   EXPECT_EQ(inventory.getBeverage(1)->getStock(), initialStock);
 }
+
+TEST(PrepaymentHandlerTest, PrePaymentCheck_Success) {
+  FakeCertificationRepository certRepo;
+  certRepo.save("VALID123", 5, 3);  // 미리 저장
+
+  FakeBeverageRepository fakeRepo;
+  Inventory inventory(&fakeRepo);
+  PrepaymentHandler handler(nullptr, &certRepo, &inventory);
+
+  auto result = handler.PrePaymentCheck("VALID123");
+
+  EXPECT_EQ(result.first, 5);
+  EXPECT_EQ(result.second, 3);
+  EXPECT_TRUE(certRepo.deleteCalled);
+  EXPECT_EQ(certRepo.savedCode, "");
+}
+
+TEST(PrepaymentHandlerTest, PrePaymentCheck_CodeNotFound) {
+  FakeCertificationRepository certRepo; // 아무것도 저장하지 않음
+
+  FakeBeverageRepository fakeRepo;
+  Inventory inventory(&fakeRepo);
+  PrepaymentHandler handler(nullptr, &certRepo, &inventory);
+
+  auto result = handler.PrePaymentCheck("UNKNOWN");
+
+  EXPECT_EQ(result.first, -1);
+  EXPECT_EQ(result.second, -1);
+  EXPECT_FALSE(certRepo.deleteCalled);
+}
