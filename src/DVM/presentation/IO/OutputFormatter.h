@@ -23,6 +23,8 @@ class OutputFormatter {
     void showGoodbye();
     void printStockShortage(Beverage *beverage);
     void printRequestingOtherDVM();
+    void printNotEnoughStock();
+    void printReturnInitialScreen();
     void printTotalPrice(int total);
     void printRequestingPrepaymentOtherDVM(std::string destDVMId);
     void printAvailableOtherDVMInfo(ResponseStock* response, int qty);

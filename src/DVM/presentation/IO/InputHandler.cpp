@@ -10,7 +10,7 @@
 
 #include "../../application/domain/Inventory.h"
 int InputHandler::getMenuSelection() {
-  std::cout << "Please select menu number: ";
+  std::cout << "> 메뉴를 선택해주세요: ";
 
   std::string line;
   if (!std::getline(std::cin, line)) {
@@ -21,11 +21,11 @@ int InputHandler::getMenuSelection() {
   std::stringstream ss(line);
   int choice;
   if (!(ss >> choice)) {
-    std::cout << "[Input Error] Please enter a valid menu number\n" << std::endl;
+    std::cout << "[입력 오류] 유효한 번호를 선택해주세요.\n" << std::endl;
   }
 
   if (!(choice == 1 || choice == 2)) {
-    std::cout << "[Input error] Please enter a valid menu number\n" << std::endl;
+    std::cout << "[입력 오류] 유효한 번호를 선택해주세요.\n" << std::endl;
   }
   return choice;
 }
@@ -34,54 +34,56 @@ std::pair<Beverage*, int> InputHandler::getDrinkSelection(Inventory* inventory) 
   int code, qty;
   Beverage *beverage;
   while (true) {
-    std::cout << "\nEnter drink code and quantity (ex: 01 2): ";
+    std::cout << "\n> 음료 코드와 수량을 입력하세요 (예: 01 2): ";
     std::string line;
     std::getline(std::cin, line);
     std::stringstream ss(line);
 
     if (!(ss >> code >> qty)) {
-      std::cout << "[Input Error] Format is invalid (ex: 01 2)\n";
+      std::cout << "\n[입력 오류] 입력 형식이 잘못되었습니다. (예: 01 2)\n";
+      std::cout << "다시 입력해주세요.\n";
+      std::cout << "-------------------------------------------\n";
       continue;
     }
 
     if (qty <= 0) {
-      std::cout << "[Quantity Error] Quantity must be at least 1.\n";
+      std::cout << "\n[수량 오류] 수량은 1 이상으로 입력해주세요.\n";
+      std::cout << "다시 입력해주세요.\n";
+      std::cout << "-------------------------------------------\n";
       continue;
     }
 
     if (!inventory->isValidCode(code)) {
-      std::cout << "[Code Error] That drink code does not exist.\n";
+      std::cout << "\n[입력 오류] 해당 음료 코드는 존재하지 않습니다.\n";
+      std::cout << "다시 입력해주세요.\n";
+      std::cout << "-------------------------------------------\n";
       continue;
     }
 
     beverage = inventory->getBeverage(code);
-    if (!inventory->isAvailable(code, qty)) {
-      int stock = beverage->getStock();
-      std::cout << "[Out of Stock] Only " << stock << " remaining.\n";
-      continue;
-    }
+
     return std::pair(beverage, qty);
   }
 }
 std::string InputHandler::getCardNumber() {
-  std::cout << "Please insert your card...\n";
+  std::cout << "카드를 삽입해주세요...\n";
 
   std::string cardNumber;
   std::getline(std::cin, cardNumber);
 
-  std::cout << "Processing card payment...\n";
+  std::cout << "\n카드 결제 중입니다...\n\n";
   return cardNumber;
 }
 char InputHandler::getYesOrNoForPayment() {
   while (true) {
-    std::cout << "\nDo you payment? (ex: Y or N): ";
+    std::cout << "\n> 결제를 진행하시겠습니까? (예: Y or N): ";
     std::string line;
     std::getline(std::cin, line);
     std::stringstream ss(line);
     char selection;
 
     if (!(ss >> selection)) {
-      std::cout << "[Input Error] Format is invalid\n";
+      std::cout << "[입력 오류] 입력 형식이 잘못되었습니다. (예: Y or N)\n";
     }
     if (selection == 'Y' || selection == 'y') {
       return selection;
@@ -90,7 +92,7 @@ char InputHandler::getYesOrNoForPayment() {
       return selection;
     }
 
-    std::cout << "[Input Error] Select Yes or No\n";
+    std::cout << "[입력 오류] 입력 형식이 잘못되었습니다. (예: Y or N)\n";
   }
 }
 

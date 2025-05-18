@@ -5,6 +5,7 @@
 #ifndef DVMCONTEXT_H
 #define DVMCONTEXT_H
 
+#include "DVMServer.h"
 #include "../application/domain/Inventory.h"
 #include "../application/service/PrepaymentHandler.h"
 #include "../application/service/PurchaseHandler.h"
@@ -22,6 +23,8 @@ class DVMContext {
     PaymentSystem* paymentSystem;
     BeverageRepository* beverageRepository;
     DVMNetworkData* dvmNetworkData;
+    CertificationCodeRepository* certificationCodeRepository;
+    DVMServer* dvmServer;
 
   public:
     DVMContext();

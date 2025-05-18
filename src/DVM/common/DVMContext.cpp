@@ -12,37 +12,45 @@ DVMContext::DVMContext()
     purchaseHandler(nullptr),
     broadCast(nullptr),
     paymentSystem(nullptr),
-    beverageRepository(nullptr) {
+    beverageRepository(nullptr),
+    certificationCodeRepository(nullptr),
+    dvmServer(nullptr) {
   dependencyInjection();
 }
 
 DVMContext::~DVMContext() {
-  delete display;
+  delete certificationCodeRepository;
+  delete beverageRepository;
+  delete paymentSystem;
+  delete broadCast;
   delete inventory;
   delete prepaymentHandler;
+  delete dvmServer;
   delete purchaseHandler;
-  delete broadCast;
-  delete paymentSystem;
-  delete beverageRepository;
+  delete display;
 }
 
 void DVMContext::dependencyInjection() {
-  std::cout << "\n=== DVM System init ===" << std::endl;
-  //TODO:의존성 주입필요
+  std::cout << "\n=== DVM System Initialize ===" << std::endl;
+  this->certificationCodeRepository = new CertificationCodeRepository("../src/DVM/database/certification-codes.txt");
   DVMNetworkData::init("../src/DVM/database/DVMData.txt");
-  this->beverageRepository = new BeverageRepository("C:/Users/user/CLionProjects/advancedsw1/src/DVM/database/beverages.txt");
-  this->inventory = new Inventory(beverageRepository);
+  this->beverageRepository = new BeverageRepository("../src/DVM/database/beverages.txt");
+  this->paymentSystem = new PaymentSystem("../src/DVM/database/paymentInformation.txt");
   this->broadCast = new BroadCast();
-  this->paymentSystem = new PaymentSystem("C:/Users/user/CLionProjects/advancedsw1/src/DVM/database/paymentInformation.txt");
-  this->prepaymentHandler = new PrepaymentHandler(broadCast);
+
+  this->inventory = new Inventory(beverageRepository);
+  this->prepaymentHandler = new PrepaymentHandler(broadCast, certificationCodeRepository, inventory);
+  this->dvmServer = new DVMServer(inventory, prepaymentHandler);
   this->purchaseHandler = new PurchaseHandler(paymentSystem, inventory);
   this->display = new Display(inventory, purchaseHandler, prepaymentHandler);
-  std::cout << "=== Init success ===" << std::endl;
+  std::cout << "=== Success Initialize ===" << std::endl;
 }
 
 void DVMContext::run() {
+  std::cout << "=== DVM Server Initialize ===" << std::endl;
+  std::thread serverThread(&DVMServer::run, dvmServer);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   std::cout << "=== DVM Start ===" << std::endl;
-  //TODO:Thread 처리를 통해 서버 실행
   while (true) {
     display->mainMenu();
   }

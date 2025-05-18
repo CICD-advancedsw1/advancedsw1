@@ -18,11 +18,13 @@
 using namespace std;
 using namespace nlohmann;
 
-PrepaymentHandler::PrepaymentHandler(BroadCast *broadCast) : broadCast(broadCast) {
+PrepaymentHandler::PrepaymentHandler(BroadCast *broadCast,
+                                     CertificationCodeRepository *certification,
+                                     Inventory* inventory) : broadCast(
+  broadCast), certificationCodeRepository(certification), inventory(inventory) {
 }
 
 PrepaymentHandler::~PrepaymentHandler() {
-
 }
 
 string PrepaymentHandler::makeRequestStockMessage(int code, int qty) {
@@ -44,7 +46,10 @@ string PrepaymentHandler::makeRequestStockMessage(int code, int qty) {
   return request.dump();
 }
 
-string PrepaymentHandler::makeRequestPrepaymentMessage(string certCode, int itemCode, int qty, string dstId) {
+string PrepaymentHandler::makeRequestPrepaymentMessage(string certCode,
+                                                       int itemCode,
+                                                       int qty,
+                                                       string dstId) {
   string reqItemCode = "";
   if (itemCode < 10) {
     reqItemCode.append("0");
@@ -58,16 +63,19 @@ string PrepaymentHandler::makeRequestPrepaymentMessage(string certCode, int item
   request["msg_content"] = {
     {"item_code", reqItemCode},
     {"item_num", to_string(qty)},
-    {"cert_code",  certCode}
+    {"cert_code", certCode}
   };
 
   return request.dump();
 }
 
-pair<bool, string> PrepaymentHandler::prepaymentRequest(Beverage* beverage, int qty, string dstIp, string dstId) {
+pair<bool, string> PrepaymentHandler::prepaymentRequest(Beverage *beverage,
+                                                        int qty,
+                                                        string dstIp,
+                                                        string dstId) {
   string certCode = generateCertificationCode(8);
   string requestMessage = makeRequestPrepaymentMessage(certCode, beverage->getCode(), qty, dstId);
-  string response = broadCast->broadCast(dstIp, 9999,  requestMessage);
+  string response = broadCast->broadCast(dstIp, DVMNetworkData::getRequestPort(), requestMessage);
   try {
     json parsed = json::parse(response);
     if (parsed["msg_type"] != "resp_prepay") {
@@ -80,14 +88,13 @@ pair<bool, string> PrepaymentHandler::prepaymentRequest(Beverage* beverage, int 
     }
 
     return pair(false, certCode);
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     std::cerr << "[JSON Parse Error] " << e.what() << std::endl;
     return pair(false, certCode);
   }
 }
 
 ResponseStock *PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) {
-
   string requestMessage = makeRequestStockMessage(beverage->getCode(), qty);
 
   vector<string> ips = DVMNetworkData::getDVMIPs();
@@ -98,7 +105,7 @@ ResponseStock *PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) 
   double minDistance = numeric_limits<double>::max();
 
   for (int i = 0; i < ips.size(); i++) {
-    string response = broadCast->broadCast(ips.at(i),9999, requestMessage);
+    string response = broadCast->broadCast(ips.at(i), DVMNetworkData::getRequestPort(), requestMessage);
     if (response.empty()) {
       continue;
     }
@@ -123,7 +130,7 @@ ResponseStock *PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) 
         availableDVMCoorX = coorX;
         availableDVMCoorY = coorY;
       }
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
       std::cerr << "[JSON Parse Error] " << e.what() << std::endl;
       continue;
     }
@@ -162,11 +169,11 @@ std::string PrepaymentHandler::generateCertificationCode(int length) {
  * @param code 입력받은 certification code
  * @return 해당 cert code의 음료코드 (-1 if not exist)
  */
-int PrepaymentHandler::PrePaymentCheck(std::string code){
+int PrepaymentHandler::PrePaymentCheck(std::string code) {
   //todo: file 입출력으로 고치기.
   //file에서 일치하는 코드 찾기
-  for(const auto& p : Cert_code){
-    if(p.first == code){
+  for (const auto &p: Cert_code) {
+    if (p.first == code) {
       EraseCode(code);
       return p.second;
     }
@@ -175,10 +182,23 @@ int PrepaymentHandler::PrePaymentCheck(std::string code){
   return -1;
 }
 
-void PrepaymentHandler::EraseCode(std::string code){
+void PrepaymentHandler::EraseCode(std::string code) {
   //todo: file 에서 지우기
-  auto it = std::find(Cert_code.begin(), Cert_code.end(), code);
+  /*auto it = std::find(Cert_code.begin(), Cert_code.end(), code);
   if(it != Cert_code.end()){
     Cert_code.erase(it);
   }
+  */
+}
+
+bool PrepaymentHandler::handlePrepaymentRequest(string certCode, int itemCode, int qty) {
+  //재고 확인
+  if (!inventory->isAvailable(itemCode, qty)) {
+    return false;
+  }
+  //인증 코드 저장
+  certificationCodeRepository->save(certCode, itemCode, qty);
+  //재고 차감
+  inventory->decreaseStock(itemCode, qty);
+  return true;
 }

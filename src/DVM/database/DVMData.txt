@@ -1,4 +1,6 @@
 DVMId T2
-DVMIPs ip1,ip2,ip3
+DVMIPs 192.168.224.208
 x 12
 y 12
+requestPort 8888
+serverPort 8888
