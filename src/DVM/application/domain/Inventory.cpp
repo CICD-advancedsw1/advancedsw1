@@ -6,8 +6,8 @@
 
 #include <iostream>
 
-Inventory::Inventory(BeverageRepository *beverageRepository): beverageRepository(
-  beverageRepository) {
+Inventory::Inventory(BeverageRepository *beverageRepository, PrepaymentHandler* prepaymentHandler): beverageRepository(
+  beverageRepository), prepaymentHandler(prepaymentHandler) {
   loadInventoryFromFile();
 }
 
