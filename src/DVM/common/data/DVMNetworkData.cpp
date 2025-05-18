@@ -76,3 +76,12 @@ int DVMNetworkData::getServerPort() {
 int DVMNetworkData::getRequestPort() {
   return requestPort;
 }
+void DVMNetworkData::setX(int x) {
+  DVMNetworkData::x = x;
+}
+void DVMNetworkData::setY(int y) {
+  DVMNetworkData::y = y;
+}
+void DVMNetworkData::setDVMIPs(const vector<string> &dvmIPs) {
+  DVMNetworkData::DVMIPs = dvmIPs;
+}

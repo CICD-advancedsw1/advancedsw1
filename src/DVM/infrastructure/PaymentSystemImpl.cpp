@@ -2,7 +2,7 @@
 // Created by kan02 on 2025-05-12.
 //
 
-#include "PaymentSystem.h"
+#include "PaymentSystemImpl.h"
 
 #include <fstream>
 #include <iostream>
@@ -10,11 +10,11 @@
 #include <utility>
 #include <vector>
 
-PaymentSystem::PaymentSystem(std::string path)
+PaymentSystemImpl::PaymentSystemImpl(std::string path)
   : path(path) {
 }
 
-std::pair<bool, std::string> PaymentSystem::connectSystem(std::string cardNumber, int price) {
+std::pair<bool, std::string> PaymentSystemImpl::connectSystem(std::string cardNumber, int price) {
   std::ifstream inFile(path);
 
   if (!inFile.is_open()) {

@@ -6,8 +6,7 @@
 #define INVENTORY_H
 
 #include <vector>
-#include "../../common/data/Beverage.h"
-#include "../../infrastructure/repository/BeverageRepository.h"
+#include "repository/BeverageRepository.h"
 
 class Inventory {
   private:

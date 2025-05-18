@@ -1,17 +1,22 @@
 //
+// Created by user on 25. 5. 18.
+//
+
+#include "FileBeverageRepository.h"
+//
 // Created by kan02 on 2025-05-12.
 //
 
-#include "BeverageRepository.h"
-
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-BeverageRepository::BeverageRepository(std::string filePath)
-  : filePath(filePath) {
-}
 
-std::vector<Beverage> BeverageRepository::loadBeveragesFromFile() {
+
+FileBeverageRepository::FileBeverageRepository(const std::string &path)
+  :filePath(path){
+}
+std::vector<Beverage> FileBeverageRepository::loadBeveragesFromFile() {
   std::ifstream file(filePath);
   if (!file.is_open()) {
     std::cerr << "[Error] Failed to open inventory file: " << filePath << std::endl;
@@ -41,7 +46,7 @@ std::vector<Beverage> BeverageRepository::loadBeveragesFromFile() {
   file.close();
   return items;
 }
-void BeverageRepository::updateBeverage(Beverage *beverage) {
+void FileBeverageRepository::updateBeverage(Beverage *beverage) {
   std::ifstream file(filePath);
   if (!file.is_open()) {
     std::cerr << "[Error] Failed to open inventory file: " << filePath << std::endl;

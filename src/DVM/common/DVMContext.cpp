@@ -5,6 +5,11 @@
 #include "DVMContext.h"
 #include <iostream>
 
+#include "../infrastructure/PaymentSystemImpl.h"
+#include "../infrastructure/repository/FileBeverageRepository.h"
+#include "../infrastructure/repository/FileCertificationCodeRepository.h"
+
+
 DVMContext::DVMContext()
   : display(nullptr),
     inventory(nullptr),
@@ -32,11 +37,11 @@ DVMContext::~DVMContext() {
 
 void DVMContext::dependencyInjection() {
   std::cout << "\n=== DVM System Initialize ===" << std::endl;
-  this->certificationCodeRepository = new CertificationCodeRepository("../src/DVM/database/certification-codes.txt");
+  this->certificationCodeRepository = new FileCertificationCodeRepository("../src/DVM/database/certification-codes.txt");
   DVMNetworkData::init("../src/DVM/database/DVMData.txt");
-  this->beverageRepository = new BeverageRepository("../src/DVM/database/beverages.txt");
-  this->paymentSystem = new PaymentSystem("../src/DVM/database/paymentInformation.txt");
-  this->broadCast = new BroadCast();
+  this->beverageRepository = new FileBeverageRepository("../src/DVM/database/beverages.txt");
+  this->paymentSystem = new PaymentSystemImpl("../src/DVM/database/paymentInformation.txt");
+  this->broadCast = new BroadCastImpl();
 
   this->inventory = new Inventory(beverageRepository);
   this->prepaymentHandler = new PrepaymentHandler(broadCast, certificationCodeRepository, inventory);

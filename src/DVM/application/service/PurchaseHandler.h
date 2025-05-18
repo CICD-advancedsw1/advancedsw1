@@ -6,9 +6,9 @@
 #define PURCHASEHANDLER_H
 #include <string>
 #include <utility>
-#include "../../infrastructure/PaymentSystem.h"
 #include "../../common/data/Beverage.h"
 #include "../../application/domain/Inventory.h"
+#include "../domain/repository/PaymentSystem.h"
 
 class PurchaseHandler {
   private:

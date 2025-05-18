@@ -33,6 +33,9 @@ class DVMNetworkData {
     static int getY();
     static int getServerPort();
     static int getRequestPort();
+    static void setX(int x);
+    static void setY(int y);
+    static void setDVMIPs(const vector<string>& dvmIPs);
 };
 
 

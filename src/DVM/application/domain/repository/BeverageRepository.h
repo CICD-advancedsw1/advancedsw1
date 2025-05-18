@@ -6,16 +6,17 @@
 #define BEVERAGEREPOSITORY_H
 #include <vector>
 #include <string>
-#include "../../common/data/Beverage.h"
+
+#include "../../../common/data/Beverage.h"
 
 
 class BeverageRepository {
   private:
     std::string filePath;
   public:
-    BeverageRepository(std::string filePath);
-    std::vector<Beverage>loadBeveragesFromFile();
-    void updateBeverage(Beverage* beverage);
+    virtual ~BeverageRepository() = default;
+    virtual std::vector<Beverage>loadBeveragesFromFile() = 0;
+    virtual void updateBeverage(Beverage* beverage) = 0;
 };
 
 

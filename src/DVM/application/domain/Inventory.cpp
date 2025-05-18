@@ -50,7 +50,7 @@ void Inventory::showBeverages() {
 }
 
 void Inventory::decreaseStock(int code, int qty) {
-  if (!isValidCode(code)) {
+  if (!isAvailable(code, qty)) {
     return;
   }
   items[code - 1].decreaseStock(qty);

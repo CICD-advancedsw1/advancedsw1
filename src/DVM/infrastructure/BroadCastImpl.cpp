@@ -2,7 +2,7 @@
 // Created by kan02 on 2025-05-12.
 //
 
-#include "BroadCast.h"
+#include "BroadCastImpl.h"
 
 #include "../common/data/DVMNetworkData.h"
 #pragma comment(lib, "ws2_32.lib")
@@ -18,11 +18,11 @@
 
 using namespace std;
 
-BroadCast::BroadCast() {
+BroadCastImpl::BroadCastImpl() {
 }
-BroadCast::~BroadCast() {
+BroadCastImpl::~BroadCastImpl() {
 }
-std::string BroadCast::broadCast(const string &ip, int port, const string &message) {
+std::string BroadCastImpl::broadCast(const string &ip, int port, const string &message) {
   WSADATA wsaData;
   if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
     std::cerr << "[WSA Error] Failed to initialize Winsock" << std::endl;

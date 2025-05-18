@@ -9,7 +9,7 @@
 #include "../application/domain/Inventory.h"
 #include "../application/service/PrepaymentHandler.h"
 #include "../application/service/PurchaseHandler.h"
-#include "../infrastructure/BroadCast.h"
+#include "../infrastructure/BroadCastImpl.h"
 #include "../presentation/UIFlow/Display.h"
 #include "data/DVMNetworkData.h"
 
@@ -19,7 +19,7 @@ class DVMContext {
     Inventory* inventory;
     PrepaymentHandler* prepaymentHandler;
     PurchaseHandler* purchaseHandler;
-    BroadCast* broadCast;
+    BroadCastImpl* broadCast;
     PaymentSystem* paymentSystem;
     BeverageRepository* beverageRepository;
     DVMNetworkData* dvmNetworkData;

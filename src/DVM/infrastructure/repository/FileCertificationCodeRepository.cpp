@@ -1,33 +1,38 @@
 //
+// Created by user on 25. 5. 18.
+//
+
+#include "FileCertificationCodeRepository.h"
+//
 // Created by kan02 on 2025-05-16.
 //
 
-#include "CertificationCodeRepository.h"
 #include <fstream>
 #include <iostream>
 #include <mutex>
 #include <optional>
 #include <sstream>
 
-CertificationCodeRepository::CertificationCodeRepository(const std::string& filePath)
-    : filePath(filePath) {
-  loadFromFile();
+
+FileCertificationCodeRepository::FileCertificationCodeRepository(
+  const std::string &filePath) : filePath(filePath) {
+  this->FileCertificationCodeRepository::loadFromFile();
 }
 
-void CertificationCodeRepository::save(const std::string& certCode, int itemCode, int itemNum) {
+void FileCertificationCodeRepository::save(const std::string &certCode, int itemCode, int itemNum) {
   std::lock_guard<std::mutex> lock(mtx);
   codeMap[certCode] = CodeInfo{itemCode, itemNum};
   saveToFile();
 }
 
-std::optional<CodeInfo> CertificationCodeRepository::findByCode(const std::string& certCode) {
+std::optional<CodeInfo> FileCertificationCodeRepository::findByCode(const std::string &certCode) {
   std::lock_guard<std::mutex> lock(mtx);
   auto it = codeMap.find(certCode);
   if (it != codeMap.end()) return it->second;
   return std::nullopt;
 }
 
-bool CertificationCodeRepository::deleteByCode(const std::string& certCode) {
+bool FileCertificationCodeRepository::deleteByCode(const std::string &certCode) {
   std::lock_guard<std::mutex> lock(mtx);
   auto it = codeMap.find(certCode);
   if (it != codeMap.end()) {
@@ -39,7 +44,7 @@ bool CertificationCodeRepository::deleteByCode(const std::string& certCode) {
   return false;
 }
 
-void CertificationCodeRepository::loadFromFile() {
+void FileCertificationCodeRepository::loadFromFile() {
   std::cout << "Load Certification Codes from File...\n";
   std::ifstream file(filePath);
   std::string line;
@@ -56,9 +61,9 @@ void CertificationCodeRepository::loadFromFile() {
   std::cout << "Load Certification Codes from File Success.\n";
 }
 
-void CertificationCodeRepository::saveToFile() {
+void FileCertificationCodeRepository::saveToFile() {
   std::ofstream file(filePath, std::ios::trunc);
-  for (const auto& [certCode, info] : codeMap) {
+  for (const auto &[certCode, info]: codeMap) {
     file << certCode << " " << info.itemCode << " " << info.itemNum << "\n";
   }
 }
