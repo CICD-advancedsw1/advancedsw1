@@ -100,8 +100,10 @@ char InputHandler::getYesOrNoForPayment() {
 std::string InputHandler::showPrePayInput(){
   std::string line;
 
-  std::cout << "============= Receive PrePayment Drink =============\n";
-  std::cout << "Input Certificate Code : \n";
+  std::cout << "\n==========================\n";
+  std::cout << "    선결제 물품 수령\n";
+  std::cout << "==========================\n";
+  std::cout << "\n인증 코드를 입력해주세요 : \n";
 
   std::getline(std::cin, line);
 

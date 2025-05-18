@@ -28,7 +28,7 @@ class PrepaymentHandler {
     void EraseCode(std::string code);
     bool handlePrepaymentRequest(std::string certCode, int itemCode, int qty);
     double findDistance(int x, int y);
-    int PrePaymentCheck(std::string code);
+    std::pair<int,int> PrePaymentCheck(std::string code);
     std::string makeRequestStockMessage(int code, int qty);
     std::string makeRequestPrepaymentMessage(std::string certCode,
                                              int itemCode,
@@ -38,7 +38,7 @@ class PrepaymentHandler {
                                                    int qty,
                                                    std::string dstIp,
                                                    std::string dstId);
-    //stockCode();
+    bool IsvalidCode(std::string code);
 };
 
 

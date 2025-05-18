@@ -29,6 +29,7 @@ class OutputFormatter {
     void printRequestingPrepaymentOtherDVM(std::string destDVMId);
     void printAvailableOtherDVMInfo(ResponseStock* response, int qty);
     void printPrePaymentCodeAndDVMLocation(const std::string& code, ResponseStock* response);
+    void showCertificateResult(bool result);
     void showError(const std::string& message);
 };
 

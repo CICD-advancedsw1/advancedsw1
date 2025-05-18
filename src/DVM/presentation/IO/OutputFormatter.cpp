@@ -47,7 +47,7 @@ void OutputFormatter::showPaymentStatus(const std::pair<bool, std::string> &stat
 
 void OutputFormatter::showGiveBeverageGuide(Beverage* beverage, int qty) {
   cout << "\n음료를 준비 중입니다...\n";
-  cout << "[음료 제공] " << beverage->getName() << qty << "개가 제공되었습니다.\n";
+  cout << "[음료 제공] " << beverage->getName() << " " << qty << "개가 제공되었습니다.\n";
 }
 
 void OutputFormatter::showGoodbye() {
@@ -91,4 +91,14 @@ void OutputFormatter::printPrePaymentCodeAndDVMLocation(const std::string& code,
   std::cout << "발급된 인증코드: *" << code << "*\n";
   std::cout << "수령 위치: x좌표 " << response->getCoorX() << "y좌표 " << response->getCoorY() <<" (" << response->getSrcId() << ")\n";
   std::cout << "\n※ 해당 위치에서 인증코드를 입력하면 음료를 받을 수 있습니다.\n";
+}
+
+void OutputFormatter::showCertificateResult(bool result){
+  if(result){
+    std::cout << "\n초기 화면으로 돌아갑니다.\n";
+    std::cout << "----------------------------------------------------\n";
+  }else{
+    std::cout << "\n[인증 실패] 유효하지 않은 코드입니다.\n";
+    std::cout << "----------------------------------------------------\n";
+  }
 }

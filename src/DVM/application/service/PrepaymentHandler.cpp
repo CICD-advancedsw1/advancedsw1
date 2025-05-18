@@ -169,26 +169,35 @@ std::string PrepaymentHandler::generateCertificationCode(int length) {
  * @param code 입력받은 certification code
  * @return 해당 cert code의 음료코드 (-1 if not exist)
  */
-int PrepaymentHandler::PrePaymentCheck(std::string code) {
-  //todo: file 입출력으로 고치기.
-  //file에서 일치하는 코드 찾기
-  for (const auto &p: Cert_code) {
-    if (p.first == code) {
-      EraseCode(code);
-      return p.second;
-    }
-  }
+std::pair<int, int> PrepaymentHandler::PrePaymentCheck(std::string code) {
+  std::optional<CodeInfo> info = certificationCodeRepository->findByCode(code);
 
-  return -1;
+  if(info != std::nullopt) {
+    EraseCode(code);
+    return {info->itemCode, info->itemNum};
+  }
+  return {-1, -1};
 }
 
 void PrepaymentHandler::EraseCode(std::string code) {
-  //todo: file 에서 지우기
-  /*auto it = std::find(Cert_code.begin(), Cert_code.end(), code);
-  if(it != Cert_code.end()){
-    Cert_code.erase(it);
+  certificationCodeRepository->deleteByCode(code);
+}
+
+/**
+ * @brief 코드가 올바른 구성인지 확인, 막상 만들고보니쓸곳이있나.....
+ */
+bool PrepaymentHandler::IsvalidCode(std::string code){
+  const std::string charset =
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "0123456789";
+
+  for (char c : code) {
+    if (charset.find(c) == std::string::npos) {
+      return false; // charset에 없는 문자가 있으면 false 반환
+    }
   }
-  */
+  return true; // 모든 문자가 charset에 포함되면 true 반환
 }
 
 bool PrepaymentHandler::handlePrepaymentRequest(string certCode, int itemCode, int qty) {
