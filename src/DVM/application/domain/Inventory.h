@@ -21,6 +21,7 @@ class Inventory {
     bool isAvailable(int code, int qty) const;
     void showBeverages();
     void decreaseStock(int code, int qty);
+    void increaseStock(int code, int qty);
 };
 
 

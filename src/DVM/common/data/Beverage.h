@@ -21,6 +21,7 @@ class Beverage {
     int getStock() const;
     int getCode() const;
     void decreaseStock(int qty);
+    void increaseStock(int qty);
 };
 
 

@@ -56,3 +56,11 @@ void Inventory::decreaseStock(int code, int qty) {
   items[code - 1].decreaseStock(qty);
   beverageRepository->updateBeverage(&items[code-1]);
 }
+
+void Inventory::increaseStock(int code, int qty) {
+  if (!isAvailable(code, qty)) {
+    return;
+  }
+  items[code - 1].increaseStock(qty);
+  beverageRepository->updateBeverage(&items[code-1]);
+}

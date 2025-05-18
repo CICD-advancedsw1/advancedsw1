@@ -28,3 +28,6 @@ int Beverage::getCode() const {
 void Beverage::decreaseStock(int qty) {
   this->stock -= qty;
 }
+void Beverage::increaseStock(int qty) {
+  this->stock += qty;
+}
