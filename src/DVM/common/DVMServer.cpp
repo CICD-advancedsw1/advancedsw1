@@ -40,7 +40,7 @@ void DVMServer::handleClient(int clientFd) {
 }
 
 string DVMServer::makeResponseStock(json jsonReq) {
-  int itemCode = jsonReq["msg_content"]["item_code"];
+  string itemCode = jsonReq["msg_content"]["item_code"];
   // 응답 JSON 구성
   json resp;
   resp["msg_type"] = "resp_stock";
@@ -48,7 +48,7 @@ string DVMServer::makeResponseStock(json jsonReq) {
   resp["dst_id"] = jsonReq["src_id"]; // 요청했던 자판기로 응답
   resp["msg_content"] = {
     {"item_code", itemCode},
-    {"item_num", inventory->getBeverage(itemCode)->getStock()},
+    {"item_num", inventory->getBeverage(stoi(itemCode))->getStock()},
     {"coor_x", DVMNetworkData::getX()},
     {"coor_y", DVMNetworkData::getY()}
   };
@@ -57,11 +57,11 @@ string DVMServer::makeResponseStock(json jsonReq) {
 }
 
 string DVMServer::makeResponsePrepay(json jsonReq) {
-  int itemCode = jsonReq["msg_content"]["item_code"];
+  string itemCode = jsonReq["msg_content"]["item_code"];
   int qty = jsonReq["msg_content"]["item_num"];
   string certCode = jsonReq["msg_content"]["cert_code"];
   string availability = "T";
-  if (!prepaymentHandler->handlePrepaymentRequest(certCode, itemCode, qty)) {
+  if (!prepaymentHandler->handlePrepaymentRequest(certCode, stoi(itemCode), qty)) {
     availability = "F";
   }
 

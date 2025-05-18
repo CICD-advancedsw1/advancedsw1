@@ -62,7 +62,7 @@ string PrepaymentHandler::makeRequestPrepaymentMessage(string certCode,
   request["dst_id"] = dstId;
   request["msg_content"] = {
     {"item_code", reqItemCode},
-    {"item_num", to_string(qty)},
+    {"item_num", qty},
     {"cert_code", certCode}
   };
 
