@@ -74,9 +74,9 @@ void OutputFormatter::printReturnInitialScreen() {
   std::cout << "----------------------------------------------------\n";
 }
 
-void OutputFormatter::printAvailableOtherDVMInfo(ResponseStock* response, int qty) {
-  std::cout << "\n[재고 확인 완료] '" << qty << "개'는 아래 DVM에서 수령 가능합니다.\n";
-  std::cout << "위치: x좌표 " << response->getCoorX() << "y좌표 " << response->getCoorY() <<" (" << response->getSrcId() << ")\n";
+void OutputFormatter::printAvailableOtherDVMInfo(ResponseStock* response, Beverage* beverage, int qty) {
+  std::cout << "\n[재고 확인 완료] '" << beverage->getName() << " " << qty << "개'는 아래 DVM에서 수령 가능합니다.\n";
+  std::cout << "위치: x좌표 " << response->getCoorX() << " y좌표 " << response->getCoorY() <<" (" << response->getSrcId() << ")\n";
 }
 
 void OutputFormatter::printTotalPrice(int total) {
@@ -86,19 +86,17 @@ void OutputFormatter::printTotalPrice(int total) {
 void OutputFormatter::printRequestingPrepaymentOtherDVM(string destDVMId) {
   std::cout << "[선결제 요청 중] "<< destDVMId << " 에 요청 중입니다...";
 }
+void OutputFormatter::printFailRequestingPrepaymentOtherDVM() {
+  std::cout << "[선결제 요청 실패] 선결제 요청에 실패했습니다..\n";
+}
 
 void OutputFormatter::printPrePaymentCodeAndDVMLocation(const std::string& code, ResponseStock* response) {
-  std::cout << "발급된 인증코드: *" << code << "*\n";
-  std::cout << "수령 위치: x좌표 " << response->getCoorX() << "y좌표 " << response->getCoorY() <<" (" << response->getSrcId() << ")\n";
+  std::cout << "발급된 인증코드: " << code << "\n";
+  std::cout << "수령 위치: x좌표 " << response->getCoorX() << " y좌표 " << response->getCoorY() <<" (" << response->getSrcId() << ")\n";
   std::cout << "\n※ 해당 위치에서 인증코드를 입력하면 음료를 받을 수 있습니다.\n";
 }
 
 void OutputFormatter::showCertificateResult(bool result){
-  if(result){
-    std::cout << "\n초기 화면으로 돌아갑니다.\n";
-    std::cout << "----------------------------------------------------\n";
-  }else{
     std::cout << "\n[인증 실패] 유효하지 않은 코드입니다.\n";
     std::cout << "----------------------------------------------------\n";
-  }
 }

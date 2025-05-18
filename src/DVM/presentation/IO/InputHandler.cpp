@@ -96,6 +96,28 @@ char InputHandler::getYesOrNoForPayment() {
   }
 }
 
+char InputHandler::getYesOrNoForPrePayment() {
+  while (true) {
+    std::cout << "\n> 선결제를 진행하시겠습니까? (예: Y or N): ";
+    std::string line;
+    std::getline(std::cin, line);
+    std::stringstream ss(line);
+    char selection;
+
+    if (!(ss >> selection)) {
+      std::cout << "[입력 오류] 입력 형식이 잘못되었습니다. (예: Y or N)\n";
+    }
+    if (selection == 'Y' || selection == 'y') {
+      return selection;
+    }
+    if (selection == 'N' || selection == 'n') {
+      return selection;
+    }
+
+    std::cout << "[입력 오류] 입력 형식이 잘못되었습니다. (예: Y or N)\n";
+  }
+}
+
 
 std::string InputHandler::showPrePayInput(){
   std::string line;

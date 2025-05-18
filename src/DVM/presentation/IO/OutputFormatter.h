@@ -27,7 +27,8 @@ class OutputFormatter {
     void printReturnInitialScreen();
     void printTotalPrice(int total);
     void printRequestingPrepaymentOtherDVM(std::string destDVMId);
-    void printAvailableOtherDVMInfo(ResponseStock* response, int qty);
+    void printFailRequestingPrepaymentOtherDVM();
+    void printAvailableOtherDVMInfo(ResponseStock* response,Beverage* beverage, int qty);
     void printPrePaymentCodeAndDVMLocation(const std::string& code, ResponseStock* response);
     void showCertificateResult(bool result);
     void showError(const std::string& message);

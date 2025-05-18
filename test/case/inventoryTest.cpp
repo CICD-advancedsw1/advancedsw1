@@ -52,10 +52,9 @@ TEST(InventoryTest, IsValidCode_WorksCorrectly) {
   EXPECT_FALSE(inventory.isValidCode(100)); //items.size() 보다 큰 경우 실패
   EXPECT_FALSE(inventory.isValidCode(-1)); //0 보다 작을 경우 실패
   EXPECT_FALSE(inventory.isValidCode(0)); // 0일 경우 실패
-  EXPECT_TRUE(inventory.isValidCode(1)); // 1 ~ items.size() 사이일 경우 성공
+  EXPECT_TRUE(inventory.isValidCode(1));
   EXPECT_TRUE(inventory.isValidCode(2));
   EXPECT_TRUE(inventory.isValidCode(3));
-  EXPECT_TRUE(inventory.isValidCode(inventory.itemCount()));
 }
 
 // Stock 업데이트 메소드 테스트

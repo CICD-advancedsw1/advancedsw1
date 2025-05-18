@@ -13,6 +13,7 @@ class InputHandler {
     std::pair<Beverage*, int> getDrinkSelection(Inventory* inventory); // code, quantity
     std::string getCardNumber();
     char getYesOrNoForPayment();
+    char getYesOrNoForPrePayment();
     std::string showPrePayInput();
 };
 

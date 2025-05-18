@@ -106,8 +106,8 @@ void Display::inputCertCode() {
 
   if(result.first == -1){
     output->showCertificateResult(false);
+    output->printReturnInitialScreen();
   }else{
-    output->showCertificateResult(true);
     output->showGiveBeverageGuide(inventory->getBeverage(result.first), result.second);
     output->showGoodbye();
   }
@@ -129,19 +129,31 @@ void Display::prePaymentMenu(Beverage *beverage, int qty) {
     return;
   }
   // [재고 확인 완료 출력]
-  output->printAvailableOtherDVMInfo(response, qty);
+  output->printAvailableOtherDVMInfo(response, beverage, qty);
   // 예: "다음 DVM에서 수령 가능합니다. 위치: X좌표 1 Y좌표 2 (DVM-05)"
   // [총 금액 출력]
   int totalPrice = beverage->getPrice() * qty;
   output->printTotalPrice(totalPrice);  // 예: "총 금액: 14000원"
 
-  //todo:input 처리 및 DVM에 요청
+  char answer = input->getYesOrNoForPrePayment();
+  if (!(answer == 'Y' || answer == 'y')) {
+    output->printReturnInitialScreen();
+  }
   pair<bool, string> result = prepaymentHandler->prepaymentRequest(beverage, qty, response->getSrcIp(), response->getSrcId());
   if (!result.first) {
-    //todo: 실패 처리
+    output->printFailRequestingPrepaymentOtherDVM();
+    output->printReturnInitialScreen();
+    return;
   }
 
-  paymentRequest(beverage, qty);
+  // 결제 중이라는 화면 출력
+  output->showPaymentMenu();
+  // 결제 로직 처리
+  // 카드 잔액 확인 및 결제 -> Inventory 에서 수량 줄이기
+  // 모두 DB 에 반영됨
+  // TODO: Transaction 처리
+  pair<bool, string> status = purchaseHandler->purchase(input->getCardNumber(), beverage, qty);
+  displayStatus(status);
 
   output->printPrePaymentCodeAndDVMLocation(result.second, response);
   output->showGoodbye();
