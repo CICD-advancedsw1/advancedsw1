@@ -17,6 +17,7 @@ class PurchaseHandler {
   public:
     PurchaseHandler(PaymentSystem *p, Inventory *i);
     std::pair<bool, std::string> purchase(std::string cardNumber, Beverage* beverage, int qty);
+    bool isValidCardFormat(const std::string &cardNumber);
 };
 
 

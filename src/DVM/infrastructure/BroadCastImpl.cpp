@@ -42,7 +42,6 @@ std::string BroadCastImpl::broadCast(const string &ip, int port, const string &m
   inet_pton(AF_INET, ip.c_str(), &serverAddr.sin_addr);
 
   if (connect(sock, (sockaddr *) &serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-    std::cerr << "[Connect Error] Cannot connect to " << ip << std::endl;
     closesocket(sock);
     WSACleanup();
     return "";

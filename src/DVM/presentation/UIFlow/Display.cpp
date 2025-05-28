@@ -105,7 +105,7 @@ void Display::inputCertCode() {
   std::pair<int,int> result = prepaymentHandler->PrePaymentCheck(code);
 
   if(result.first == -1){
-    output->showCertificateResult(false);
+    output->showCertificateResult(result.second);
     output->printReturnInitialScreen();
   }else{
     output->showGiveBeverageGuide(inventory->getBeverage(result.first), result.second);

@@ -30,9 +30,19 @@ void DVMServer::handleClient(int clientFd) {
     else if (jsonReq["msg_type"] == "req_prepay") {
       response = makeResponsePrepay(jsonReq);
     }
+    else {
+      response = R"({"error": "Unknown msg_type"})";
+    }
 
-    // 응답 전송
-    send(clientFd, response.c_str(), response.size(), 0);
+    // 응답 전송 (전송 실패 시 로그 출력)
+    if (send(clientFd, response.c_str(), response.size(), 0) == -1) {
+      perror("[DVMServer] 응답 전송 실패");
+
+      string itemCode = jsonReq["msg_content"]["item_code"];
+      int qty = jsonReq["msg_content"]["item_num"];
+      string certCode = jsonReq["msg_content"]["cert_code"];
+      prepaymentHandler->rollBackPrepaymentRequest(certCode, stoi(itemCode), qty);
+    }
   }
 
   // 연결 종료

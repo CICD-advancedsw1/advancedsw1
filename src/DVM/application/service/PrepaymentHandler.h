@@ -27,6 +27,7 @@ class PrepaymentHandler {
     std::string generateCertificationCode(int length);
     void EraseCode(std::string code);
     bool handlePrepaymentRequest(std::string certCode, int itemCode, int qty);
+    bool rollBackPrepaymentRequest(std::string certCode, int itemCode, int qty);
     double findDistance(int x, int y);
     std::pair<int,int> PrePaymentCheck(std::string code);
     std::string makeRequestStockMessage(int code, int qty);

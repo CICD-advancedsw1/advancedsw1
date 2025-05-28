@@ -41,7 +41,7 @@ void OutputFormatter::showPaymentStatus(const std::pair<bool, std::string> &stat
   if (status.first) {
     std::cout <<  status.second << std::endl;
   } else {
-    std::cerr << status.second << std::endl;
+    std::cout << status.second << std::endl;
   }
 }
 
@@ -96,7 +96,13 @@ void OutputFormatter::printPrePaymentCodeAndDVMLocation(const std::string& code,
   std::cout << "\n※ 해당 위치에서 인증코드를 입력하면 음료를 받을 수 있습니다.\n";
 }
 
-void OutputFormatter::showCertificateResult(bool result){
-    std::cout << "\n[인증 실패] 유효하지 않은 코드입니다.\n";
+void OutputFormatter::showCertificateResult(int result){
+  if (result == 1) {
+    std::cout << "\n[인증 실패] 인증 코드의 형식이 잘못되었습니다.\n";
     std::cout << "----------------------------------------------------\n";
+  }
+  else if (result == 2) {
+    std::cout << "\n[인증 실패] 존재하지 않는 코드입니다.\n";
+    std::cout << "----------------------------------------------------\n";
+  }
 }

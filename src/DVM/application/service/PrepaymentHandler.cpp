@@ -107,6 +107,7 @@ ResponseStock *PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) 
   for (int i = 0; i < ips.size(); i++) {
     string response = broadCast->broadCast(ips.at(i), DVMNetworkData::getRequestPort(), requestMessage);
     if (response.empty()) {
+      std::cout << "[연결 오류] "<< i << "번 DVM 연결에 실패했습니다." << std::endl;
       continue;
     }
     try {
@@ -136,6 +137,7 @@ ResponseStock *PrepaymentHandler::findAvailableDVM(Beverage *beverage, int qty) 
     }
   }
   if (minDistance == numeric_limits<double>::max()) {
+    std::cout << "[재고 부족] "<< "타 DVM에 확인된 재고가 없습니다." << std::endl;
     return nullptr;
   }
 
@@ -170,13 +172,16 @@ std::string PrepaymentHandler::generateCertificationCode(int length) {
  * @return 해당 cert code의 음료코드 (-1 if not exist)
  */
 std::pair<int, int> PrepaymentHandler::PrePaymentCheck(std::string code) {
+  if (!IsvalidCode(code)) {
+    return {-1, 1};
+  }
   std::optional<CodeInfo> info = certificationCodeRepository->findByCode(code);
 
   if(info != std::nullopt) {
     EraseCode(code);
     return {info->itemCode, info->itemNum};
   }
-  return {-1, -1};
+  return {-1, 2};
 }
 
 void PrepaymentHandler::EraseCode(std::string code) {
@@ -187,6 +192,9 @@ void PrepaymentHandler::EraseCode(std::string code) {
  * @brief 코드가 올바른 구성인지 확인, 막상 만들고보니쓸곳이있나.....
  */
 bool PrepaymentHandler::IsvalidCode(std::string code){
+  if (code.size() != 8) {
+    return false;
+  }
   const std::string charset =
         "abcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -209,5 +217,13 @@ bool PrepaymentHandler::handlePrepaymentRequest(string certCode, int itemCode, i
   certificationCodeRepository->save(certCode, itemCode, qty);
   //재고 차감
   inventory->decreaseStock(itemCode, qty);
+  return true;
+}
+
+bool PrepaymentHandler::rollBackPrepaymentRequest(string certCode, int itemCode, int qty) {
+  //인증 코드 삭제
+  certificationCodeRepository->deleteByCode(certCode);
+  //재고 증가
+  inventory->increaseStock(itemCode, qty);
   return true;
 }
