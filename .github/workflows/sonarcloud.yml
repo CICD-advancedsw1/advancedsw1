@@ -1,48 +1,76 @@
-name: SonarCloud C++ Analysis
+name: SonarCloud C++ Static Analysis with Coverage
 
 on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    name: Analyze with SonarCloud
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install build-essential unzip wget -y
-
-      #- name: Download and extract build-wrapper
-      #  run: |
-      #    wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
-      #    unzip build-wrapper-linux-x86.zip
+          sudo apt install -y build-essential cmake lcov libgtest-dev unzip wget
+          pip install gcovr==6.0
 
       - name: Extract local build-wrapper
-        run: |
-          unzip tools/build-wrapper-linux-x86.zip
+        run: unzip tools/build-wrapper-linux-x86.zip
 
-      - name: Build project with build-wrapper
+      - name: CMake Configure with Coverage Flags
         run: |
-          mkdir bw-output
-          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output g++ main.cpp -o main
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="--coverage" \
+            -DCMAKE_C_FLAGS="--coverage"
 
-      - name: Download and run SonarScanner
+      - name: Build with build-wrapper
+        run: |
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output \
+            cmake --build build
+
+      - name: Run Tests (all *_test)
+        run: |
+          cd build
+          ./MyTests
+          cd ..
+
+          
+      - name: Generate coverage report
+        run: |
+          gcovr -r . \
+            --sonarqube \
+            --object-directory build \
+            --exclude ".*CMakeFiles.*" \
+            --exclude-unreachable-branches \
+            --gcov-ignore-errors=no_working_dir_found \
+            -o coverage.xml
+
+      - name: Check coverage.xml
+        run: cat coverage.xml
+
+          
+      - name: Run SonarScanner
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
           unzip sonar-scanner-cli-5.0.1.3006-linux.zip
-          sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner
+          sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+            -Dsonar.projectKey=virtuoso108_advancedsw \
+            -Dsonar.organization=virtuoso108 \
+            -Dsonar.sources=src \
+            -Dsonar.cfamily.build-wrapper-output=bw-output \
+            -Dsonar.coverageReportPaths=coverage.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Notify Slack (Success)
+      - name: Notify Slack
         if: success()
         run: |
           curl -X POST -H 'Content-type: application/json' \
