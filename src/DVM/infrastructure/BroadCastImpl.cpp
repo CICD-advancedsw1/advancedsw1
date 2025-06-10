@@ -20,7 +20,15 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")  // Optional: link library on MSVC
+typedef SOCKET socket_t;
+#else
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+typedef int socket_t;
 #endif
+
+
 
 
 #include <unistd.h>
@@ -46,7 +54,9 @@ std::string BroadCastImpl::broadCast(const string &ip, int port, const string &m
 
   
 
-  SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  //SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  socket_t sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  
   if (sock == INVALID_SOCKET) {
     std::cerr << "[Socket Error] Cannot create socket" << std::endl;
     WSACleanup();
