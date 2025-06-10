@@ -57,11 +57,31 @@ std::string BroadCastImpl::broadCast(const string &ip, int port, const string &m
   //SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   socket_t sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   
-  if (sock == INVALID_SOCKET) {
+  /* if (sock == INVALID_SOCKET) {
     std::cerr << "[Socket Error] Cannot create socket" << std::endl;
     WSACleanup();
     return "";
-  }
+  }*/
+
+  #ifdef _WIN32
+    if (sock == INVALID_SOCKET) {
+        std::cerr << "[Socket Error] Cannot create socket (Windows)" << std::endl;
+        WSACleanup();
+        return "";
+    }
+#else
+    if (sock == -1) {
+        std::cerr << "[Socket Error] Cannot create socket (Linux)" << std::endl;
+        return "";
+    }
+#endif
+
+
+
+
+  
+
+  
 
   sockaddr_in serverAddr{};
   serverAddr.sin_family = AF_INET;
