@@ -8,7 +8,13 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #define WIN32_LEAN_AND_MEAN  // 줄일 수 있는 헤더만 포함
+
+
+#ifdef _WIN32
 #include <winsock2.h>
+#endif
+
+
 #include <ws2tcpip.h>
 #include <unistd.h>
 #include <iostream>
