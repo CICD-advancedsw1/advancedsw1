@@ -1,7 +1,9 @@
 // Your First C++ Program
 
 #include <iostream>
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 #include "src/DVM/common/DVMContext.h"
 
