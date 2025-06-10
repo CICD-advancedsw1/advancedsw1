@@ -79,4 +79,8 @@ target_link_libraries(MyTests
 include(GoogleTest)
 gtest_discover_tests(MyTests)
 
+if(WIN32)
 target_link_libraries(main PRIVATE ws2_32)
+endif()
+
+
