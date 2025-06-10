@@ -13,10 +13,14 @@
 
 
 #ifdef _WIN32
-#include <winsock2.h>
 #include <ws2tcpip.h>
 #endif
 
+
+#ifdef _WIN32
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32.lib")  // Optional: link library on MSVC
+#endif
 
 
 #include <unistd.h>
@@ -32,11 +36,15 @@ BroadCastImpl::BroadCastImpl() {
 BroadCastImpl::~BroadCastImpl() {
 }
 std::string BroadCastImpl::broadCast(const string &ip, int port, const string &message) {
+  #ifdef _WIN32
   WSADATA wsaData;
   if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
     std::cerr << "[WSA Error] Failed to initialize Winsock" << std::endl;
     return "";
   }
+#endif
+
+  
 
   SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (sock == INVALID_SOCKET) {
