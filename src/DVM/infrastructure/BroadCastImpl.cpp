@@ -131,7 +131,10 @@ std::string BroadCastImpl::broadCast(const string &ip, int port, const string &m
 
 
   
-  WSACleanup();
+  //WSACleanup();
+  #ifdef _WIN32
+    WSACleanup();
+  #endif
 
   if (len > 0) {
     return std::string(buffer, len);
