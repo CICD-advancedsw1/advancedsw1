@@ -122,7 +122,15 @@ std::string BroadCastImpl::broadCast(const string &ip, int port, const string &m
   char buffer[1024] = {0};
   int len = recv(sock, buffer, sizeof(buffer), 0);
 
-  closesocket(sock);
+  //closesocket(sock);
+  #ifdef _WIN32
+    closesocket(sock);
+  #else
+    close(sock);
+  #endif
+
+
+  
   WSACleanup();
 
   if (len > 0) {
