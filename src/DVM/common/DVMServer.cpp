@@ -117,8 +117,18 @@ DVMServer::DVMServer(Inventory* inventory, PrepaymentHandler* prepaymentHandler)
 }
 
 void DVMServer::run() {
-  WSADATA wsaData;
-  WSAStartup(MAKEWORD(2, 2), &wsaData);
+  //WSADATA wsaData;
+  //WSAStartup(MAKEWORD(2, 2), &wsaData);
+  #ifdef _WIN32
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        std::cerr << "WSAStartup failed" << std::endl;
+        return 1;
+    }
+  #endif
+
+  
+  
 
   serverFd = socket(AF_INET, SOCK_STREAM, 0);
   if (serverFd == -1) {
