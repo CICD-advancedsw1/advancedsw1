@@ -10,7 +10,12 @@
 #include <thread>
 #include <cstring>
 #include <unistd.h>
+
+
+#ifdef _WIN32
 #include <ws2tcpip.h>
+#endif
+
 #include <winsock2.h>
 
 #include"../../../include/nlohmann/json.hpp"
