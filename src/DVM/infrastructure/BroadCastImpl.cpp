@@ -88,11 +88,34 @@ std::string BroadCastImpl::broadCast(const string &ip, int port, const string &m
   serverAddr.sin_port = htons(port);
   inet_pton(AF_INET, ip.c_str(), &serverAddr.sin_addr);
 
+  /* 
   if (connect(sock, (sockaddr *) &serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
     closesocket(sock);
     WSACleanup();
     return "";
-  }
+  } 
+  */
+
+  #ifdef _WIN32
+    if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+        std::cerr << "[Connect Error] Windows socket error: " << WSAGetLastError() << std::endl;
+        closesocket(sock);
+        WSACleanup();
+        return "";
+    }
+#else
+    if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+        perror("[Connect Error]");
+        close(sock);
+        return "";
+    }
+#endif
+
+
+
+  
+
+  
 
   send(sock, message.c_str(), static_cast<int>(message.length()), 0);
 
