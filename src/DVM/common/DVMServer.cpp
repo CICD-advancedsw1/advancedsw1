@@ -3,8 +3,29 @@
 //
 
 #include "DVMServer.h"
+//#include <winsock2.h>
+//#pragma comment(lib, "ws2_32.lib") // MSVC일 때만 필요, MinGW에서는 자동 연결
+
+
+#ifdef _WIN32
 #include <winsock2.h>
-#pragma comment(lib, "ws2_32.lib") // MSVC일 때만 필요, MinGW에서는 자동 연결
+#pragma comment(lib, "ws2_32.lib")
+#else
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+#define SOCKET int
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket close
+#define WSAStartup(a, b) ((void)0)
+#define WSACleanup() ((void)0)
+#endif
+
+
+
+
 
 #include "../application/domain/Inventory.h"
 #include "../application/service/PrepaymentHandler.h"
