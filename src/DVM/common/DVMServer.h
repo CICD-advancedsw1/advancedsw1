@@ -16,7 +16,11 @@
 #include <ws2tcpip.h>
 #endif
 
+
+#ifdef _WIN32
 #include <winsock2.h>
+#endif
+
 
 #include"../../../include/nlohmann/json.hpp"
 
