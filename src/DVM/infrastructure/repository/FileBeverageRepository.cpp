@@ -17,6 +17,7 @@ FileBeverageRepository::FileBeverageRepository(const std::string &path)
   :filePath(path){
 }
 std::vector<Beverage> FileBeverageRepository::loadBeveragesFromFile() {
+  std::lock_guard<std::mutex> lock(fileMutex);
   std::ifstream file(filePath);
   if (!file.is_open()) {
     std::cerr << "[Error] Failed to open inventory file: " << filePath << std::endl;
@@ -38,7 +39,7 @@ std::vector<Beverage> FileBeverageRepository::loadBeveragesFromFile() {
       int stock = std::stoi(stockStr);
       int code = std::stoi(codeStr);
 
-      items.emplace_back(Beverage(name, price, stock, code));
+      items.emplace_back(Beverage(name, price, stock, code, 100));
       std::cout << "Loaded beverage: " << code << ", " << name << std::endl;
     }
   }
@@ -47,6 +48,7 @@ std::vector<Beverage> FileBeverageRepository::loadBeveragesFromFile() {
   return items;
 }
 void FileBeverageRepository::updateBeverage(Beverage *beverage) {
+  std::lock_guard<std::mutex> lock(fileMutex);
   std::ifstream file(filePath);
   if (!file.is_open()) {
     std::cerr << "[Error] Failed to open inventory file: " << filePath << std::endl;

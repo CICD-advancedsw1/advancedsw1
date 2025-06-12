@@ -45,6 +45,7 @@ bool FileCertificationCodeRepository::deleteByCode(const std::string &certCode) 
 }
 
 void FileCertificationCodeRepository::loadFromFile() {
+  std::lock_guard<std::mutex> lock(mtx);
   std::cout << "Load Certification Codes from File...\n";
   std::ifstream file(filePath);
   std::string line;
@@ -62,6 +63,7 @@ void FileCertificationCodeRepository::loadFromFile() {
 }
 
 void FileCertificationCodeRepository::saveToFile() {
+  std::lock_guard<std::mutex> lock(mtx);
   std::ofstream file(filePath, std::ios::trunc);
   for (const auto &[certCode, info]: codeMap) {
     file << certCode << " " << info.itemCode << " " << info.itemNum << "\n";
