@@ -13,13 +13,15 @@ class Beverage {
     int price;
     int stock;
     int code;
+    int maxStock;
 
   public:
-    Beverage(const std::string &name, int price, int stock, int code);
+    Beverage(const std::string &name, int price, int stock, int code, int maxStock);
     std::string getName() const;
     int getPrice() const;
     int getStock() const;
     int getCode() const;
+    int getMaxStock() const;
     void decreaseStock(int qty);
     void increaseStock(int qty);
 };
