@@ -33,6 +33,7 @@
 
 using json = nlohmann::json;
 
+
 void DVMServer::handleClient(int clientFd) {
   char buffer[1024];
 
@@ -43,7 +44,25 @@ void DVMServer::handleClient(int clientFd) {
     std::string request(buffer);
 
     // 요청 처리 및 응답 생성
-    json jsonReq = json::parse(request);
+    json jsonReq;
+    try {
+      jsonReq = json::parse(request);
+    }catch (const nlohmann::json::parse_error& e) {
+      std::cerr << "[DVMServer] JSON 파싱 오류: " << e.what() << std::endl;
+      std::string errorResp = R"({"error": "Invalid JSON format"})";
+      send(clientFd, errorResp.c_str(), errorResp.size(), 0);
+      close(clientFd);
+      return;
+    }
+
+    // msg_type 검사
+    if (!jsonReq.contains("msg_type") || !jsonReq["msg_type"].is_string()) {
+      std::string errorResp = R"({"error": "Missing or invalid 'msg_type'"})";
+      send(clientFd, errorResp.c_str(), errorResp.size(), 0);
+      close(clientFd);
+      return;
+    }
+
     string response;
     if (jsonReq["msg_type"] == "req_stock") {
       response = makeResponseStock(jsonReq);
@@ -71,6 +90,20 @@ void DVMServer::handleClient(int clientFd) {
 }
 
 string DVMServer::makeResponseStock(json jsonReq) {
+  // 필수 필드 검사
+  if (!jsonReq.contains("msg_content") || !jsonReq["msg_content"].is_object()) {
+    return R"({"error": "Missing or invalid 'msg_content'"})";
+  }
+  json& content = jsonReq["msg_content"];
+
+  if (!content.contains("item_code") || !content["item_code"].is_string()) {
+    return R"({"error": "Missing or invalid 'item_code'"})";
+  }
+
+  if (!jsonReq.contains("src_id") || !jsonReq["src_id"].is_string()) {
+    return R"({"error": "Missing or invalid 'src_id'"})";
+  }
+
   string itemCode = jsonReq["msg_content"]["item_code"];
   // 응답 JSON 구성
   json resp;
@@ -88,6 +121,26 @@ string DVMServer::makeResponseStock(json jsonReq) {
 }
 
 string DVMServer::makeResponsePrepay(json jsonReq) {
+
+  // 필수 필드 검사
+  if (!jsonReq.contains("msg_content") || !jsonReq["msg_content"].is_object()) {
+    return R"({"error": "Missing or invalid 'msg_content'"})";
+  }
+  json& content = jsonReq["msg_content"];
+
+  if (!content.contains("item_code") || !content["item_code"].is_string()) {
+    return R"({"error": "Missing or invalid 'item_code'"})";
+  }
+  if (!content.contains("item_num") || !content["item_num"].is_number_integer()) {
+    return R"({"error": "Missing or invalid 'item_num'"})";
+  }
+  if (!content.contains("cert_code") || !content["cert_code"].is_string()) {
+    return R"({"error": "Missing or invalid 'cert_code'"})";
+  }
+  if (!jsonReq.contains("src_id") || !jsonReq["src_id"].is_string()) {
+    return R"({"error": "Missing or invalid 'src_id'"})";
+  }
+
   string itemCode = jsonReq["msg_content"]["item_code"];
   int qty = jsonReq["msg_content"]["item_num"];
   string certCode = jsonReq["msg_content"]["cert_code"];
@@ -123,7 +176,7 @@ void DVMServer::run() {
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "WSAStartup failed" << std::endl;
-        return 1;
+        return;
     }
   #endif
 
@@ -164,6 +217,15 @@ void DVMServer::run() {
     int clientFd = accept(serverFd, (sockaddr*)&clientAddr, &clientLen);
     if (clientFd == -1) {
       perror("[DVMServer] 클라이언트 연결 실패");
+      continue;
+    }
+
+    // 초당 20개의 연결이 이미 존재할 경우 연결 거부
+    if (detector.checkOverload()) {
+      std::cerr << "[WARNING] System Overload Detected!\n";
+      std::string overloadResponse = R"({"result":"error","reason":"System overload"})";
+      send(clientFd, overloadResponse.c_str(), overloadResponse.size(), 0);
+      close(clientFd);
       continue;
     }
     handleClient(clientFd);

@@ -22,6 +22,8 @@
 #endif
 
 
+
+#include "OverloadDetector.h"
 #include"../../../include/nlohmann/json.hpp"
 
 class PrepaymentHandler;
@@ -37,6 +39,7 @@ class DVMServer {
     void handleClient(int clientFd);
     string makeResponseStock(nlohmann::json jsonReq);
     string makeResponsePrepay(nlohmann::json jsonReq);
+    OverloadDetector detector = OverloadDetector(20);
 
   public:
     DVMServer(Inventory* inventory, PrepaymentHandler* prepaymentHandler);
