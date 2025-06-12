@@ -51,6 +51,7 @@ add_executable(main
         test/fake/FakePaymentSystem.h
         test/fake/FakeCertificationRepository.h
         test/fake/FakeBroadCast.h
+        src/DVM/common/OverloadDetector.h
 )
 
 
@@ -81,7 +82,6 @@ gtest_discover_tests(MyTests)
 
 if(WIN32)
 target_link_libraries(main PRIVATE ws2_32)
-target_link_libraries(MyTests PRIVATE ws2_32)
 endif()
 
 
