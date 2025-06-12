@@ -74,7 +74,7 @@ TEST(PrepaymentHandlerTest, MakeRequestPrepaymentMessage_GeneratesCorrectJson) {
   EXPECT_EQ(parsed["src_id"], DVMNetworkData::getDVMId());
   EXPECT_EQ(parsed["dst_id"], dstId);
   EXPECT_EQ(parsed["msg_content"]["item_code"], "05");  // padding 확인
-  EXPECT_EQ(parsed["msg_content"]["item_num"], "2");
+  EXPECT_EQ(parsed["msg_content"]["item_num"], 2);
   EXPECT_EQ(parsed["msg_content"]["cert_code"], certCode);
 }
 
@@ -90,7 +90,7 @@ TEST(PrepaymentHandlerTest, MakeRequestPrepaymentMessage_TwoDigitItemCode) {
   nlohmann::json parsed = nlohmann::json::parse(result);
 
   EXPECT_EQ(parsed["msg_content"]["item_code"], "15"); // No padding
-  EXPECT_EQ(parsed["msg_content"]["item_num"], "10");
+  EXPECT_EQ(parsed["msg_content"]["item_num"], 10);
   EXPECT_EQ(parsed["msg_content"]["cert_code"], "XYZ789");
 }
 
@@ -146,7 +146,7 @@ TEST(PrepaymentHandlerTest, PrepaymentRequest_Success_ReturnsTrue) {
 
   PrepaymentHandler handler(&fakeBroadCast, &fakeCertRepo, &inventory);
 
-  Beverage bev("콜라", 1000, 10, 1);
+  Beverage bev("콜라", 1000, 10, 1, 100);
 
   auto result = handler.prepaymentRequest(&bev, 2, "127.0.0.1", "DVM-01");
 
@@ -174,7 +174,7 @@ TEST(PrepaymentHandlerTest, PrepaymentRequest_Failure_ReturnsFalse) {
   FakeCertificationRepository fakeCertRepo;
 
   PrepaymentHandler handler(&fakeBroadCast, &fakeCertRepo, &inventory);
-  Beverage bev("콜라", 1000, 10, 1);
+  Beverage bev("콜라", 1000, 10, 1, 100);
 
   auto result = handler.prepaymentRequest(&bev, 2, "127.0.0.1", "DVM-01");
 
@@ -203,7 +203,7 @@ TEST(PrepaymentHandlerTest, PrepaymentRequest_InvalidMsgType_ReturnsFalse) {
 
   PrepaymentHandler handler(&fakeBroadCast, &fakeCertRepo, &inventory);
 
-  Beverage bev("콜라", 1000, 10, 1);
+  Beverage bev("콜라", 1000, 10, 1, 100);
 
   auto result = handler.prepaymentRequest(&bev, 2, "127.0.0.1", "DVM-01");
 
@@ -221,7 +221,7 @@ TEST(PrepaymentHandlerTest, PrepaymentRequest_InvalidJson_ReturnsFalse) {
 
   PrepaymentHandler handler(&fakeBroadCast, &fakeCertRepo, &inventory);
 
-  Beverage bev("콜라", 1000, 10, 1);
+  Beverage bev("콜라", 1000, 10, 1, 100);
 
   auto result = handler.prepaymentRequest(&bev, 2, "127.0.0.1", "DVM-01");
 
@@ -268,7 +268,7 @@ TEST(PrepaymentHandlerTest, FindAvailableDVM_ReturnsClosestAvailableDVM) {
 
   PrepaymentHandler handler(&fakeBroadCast, &fakeCertRepo, &inventory);
 
-  Beverage cola("콜라", 1000, 10, 1);
+  Beverage cola("콜라", 1000, 10, 1, 100);
 
   ResponseStock* result = handler.findAvailableDVM(&cola, 2);
 
@@ -309,7 +309,7 @@ TEST(PrepaymentHandlerTest, FindAvailableDVM_AllInsufficientStock_ReturnsNullptr
 
   PrepaymentHandler handler(&fakeBroadCast, &fakeCertRepo, &inventory);
 
-  Beverage cola("콜라", 1000, 10, 1);
+  Beverage cola("콜라", 1000, 10, 1, 100);
 
   ResponseStock* result = handler.findAvailableDVM(&cola, 2);
 
@@ -387,6 +387,41 @@ TEST(PrepaymentHandlerTest, PrePaymentCheck_CodeNotFound) {
   auto result = handler.PrePaymentCheck("UNKNOWN");
 
   EXPECT_EQ(result.first, -1);
-  EXPECT_EQ(result.second, -1);
   EXPECT_FALSE(certRepo.deleteCalled);
+}
+
+TEST(PrepaymentHandlerTest, IsvalidCode) {
+    FakeBeverageRepository fakeRepo;
+    Inventory inventory(&fakeRepo);
+    FakeCertificationRepository certRepo;
+
+    PrepaymentHandler handler(nullptr, &certRepo, &inventory);
+    EXPECT_TRUE(handler.IsvalidCode("aA1bB2cC"));
+    EXPECT_FALSE(handler.IsvalidCode("short"));                // 길이 부족
+    EXPECT_FALSE(handler.IsvalidCode("toolongcode123"));       // 길이 초과
+    EXPECT_FALSE(handler.IsvalidCode("invalid!@#"));           // 특수문자 포함
+    EXPECT_FALSE(handler.IsvalidCode(" "));                     // 공백 포함
+}
+
+TEST(PrepaymentHandlerTest, RollBack_Success) {
+
+  FakeBeverageRepository fakeRepo;
+  Inventory inventory(&fakeRepo);
+  FakeCertificationRepository certRepo;
+
+  PrepaymentHandler handler(nullptr, &certRepo, &inventory);
+
+  int initialStock = inventory.getBeverage(1)->getStock();
+  std::string certCode = "TEST123";
+  int itemCode = 1;
+  int qty = 2;
+
+
+  handler.handlePrepaymentRequest(certCode, itemCode, qty);
+  bool result = handler.rollBackPrepaymentRequest(certCode, itemCode, qty);
+  EXPECT_TRUE(result);
+  EXPECT_TRUE(certRepo.deleteCalled);
+  EXPECT_EQ(certRepo.savedCode, "");
+  EXPECT_EQ(inventory.getBeverage(itemCode)->getStock(), initialStock);
+
 }

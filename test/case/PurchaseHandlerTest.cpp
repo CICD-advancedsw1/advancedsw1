@@ -15,12 +15,12 @@ TEST(PurchaseHandlerTest, Purchase_Success) {
   Beverage* purchaseBeverage = inventory.getBeverage(1);
   int initialStock = purchaseBeverage->getStock();
   int purchaseStock = 2;
-  auto result = handler.purchase("1234-5678", purchaseBeverage, purchaseStock);
+  auto result = handler.purchase("1111-1111-1111-1111", purchaseBeverage, purchaseStock);
 
   EXPECT_TRUE(result.first);
   EXPECT_EQ(result.second, "결제 성공");
   EXPECT_TRUE(payment.connected);
-  EXPECT_EQ(payment.lastCard, "1234-5678");
+  EXPECT_EQ(payment.lastCard, "1111-1111-1111-1111");
   EXPECT_EQ(payment.lastAmount, 2000);
 
   EXPECT_EQ(inventory.getBeverage(1)->getStock(), initialStock-purchaseStock);
@@ -36,7 +36,7 @@ TEST(PurchaseHandlerTest, Purchase_Fail_InsufficientBalance) {
   int initialStock = purchaseBeverage->getStock();
   int purchaseStock = 2;
   payment.shouldSucceed = false;
-  auto result = handler.purchase("1234-5678", purchaseBeverage, purchaseStock);
+  auto result = handler.purchase("1111-1111-1111-1111", purchaseBeverage, purchaseStock);
 
   EXPECT_FALSE(result.first);
   EXPECT_EQ(result.second, "잔액 부족");

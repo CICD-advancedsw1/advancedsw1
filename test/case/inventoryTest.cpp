@@ -88,3 +88,25 @@ TEST(InventoryTest, DecreaseStock_Fail_NOT_ENOUGH_Qty) {
 
   EXPECT_FALSE(fakeRepo.updateCalled);
 }
+
+// MAX STOCK 보다 크게 증가시켰을 시
+TEST(InventoryTest, IncreaseStock_MAX) {
+  FakeBeverageRepository fakeRepo;
+  Inventory inventory(&fakeRepo);
+  Beverage* testBeverage = inventory.getBeverage(1);
+  int testBeverageQty = testBeverage->getStock();
+  inventory.increaseStock(1, testBeverage->getMaxStock() + 1);
+
+  EXPECT_EQ(testBeverage->getStock(), testBeverageQty);
+}
+
+// MAX STOCK 보다 작게 증가시켰을 때
+TEST(InventoryTest, IncreaseStock_Success) {
+  FakeBeverageRepository fakeRepo;
+  Inventory inventory(&fakeRepo);
+  Beverage* testBeverage = inventory.getBeverage(1);
+  int testBeverageQty = testBeverage->getStock();
+  inventory.increaseStock(1, 10);
+
+  EXPECT_EQ(testBeverage->getStock(), testBeverageQty + 10);
+}

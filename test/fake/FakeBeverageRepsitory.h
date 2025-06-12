@@ -11,13 +11,13 @@ class FakeBeverageRepository: public BeverageRepository {
   public:
     std::vector<Beverage> loadBeveragesFromFile() override {
       return {
-        Beverage("콜라", 1000, 10, 1),
-        Beverage("사이다", 1200, 5, 2),
-        Beverage("녹차", 1300, 10, 3),
-        Beverage("홍차", 1300, 10, 4),
-        Beverage("밀크티", 1500, 10, 5),
-        Beverage("탄산수", 1000, 10, 6),
-        Beverage("보리차", 1100, 10, 7),
+        Beverage("콜라", 1000, 10, 1, 100),
+        Beverage("사이다", 1200, 5, 2, 100),
+        Beverage("녹차", 1300, 10, 3, 100),
+        Beverage("홍차", 1300, 10, 4, 100),
+        Beverage("밀크티", 1500, 10, 5, 100),
+        Beverage("탄산수", 1000, 10, 6, 100),
+        Beverage("보리차", 1100, 10, 7, 100),
       };
     }
 
